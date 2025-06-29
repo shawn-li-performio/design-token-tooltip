@@ -1,11 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OutputFormatter = void 0;
-class OutputFormatter {
+exports.TokenInspector = void 0;
+class TokenInspector {
+    constructor(designTokenHoverProvider) {
+        this.designTokenHoverProvider = designTokenHoverProvider;
+        this.designTokenHoverProvider = designTokenHoverProvider;
+    }
     /**
      * 输出详细的加载结果
      */
-    static outputLoadingResults(tokenData, tokenMap) {
+    outputTokenLoadingResults() {
+        const tokenData = this.designTokenHoverProvider.getTokenData();
+        const tokenMap = this.designTokenHoverProvider.getTokenMap();
         console.log("\n🎨 ===== DESIGN TOKENS LOADED =====");
         console.log(`📊 Total tokens found: ${tokenMap.size}`);
         console.log("📋 Raw data structure keys:", Object.keys(tokenData));
@@ -59,5 +65,5 @@ class OutputFormatter {
         console.log("\n🎯 ===== END DESIGN TOKENS =====\n");
     }
 }
-exports.OutputFormatter = OutputFormatter;
+exports.TokenInspector = TokenInspector;
 //# sourceMappingURL=OutputFormatter.js.map

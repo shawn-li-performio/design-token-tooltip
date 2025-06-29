@@ -5,7 +5,7 @@ export class TokenParser {
    * 构建 token 映射表，方便快速查找
    * we made this method stateless
    */
-  buildTokenMap(tokenData: TokenData, tokenMap: Map<string, any>) {
+  public buildTokenMap(tokenData: TokenData, tokenMap: Map<string, any>) {
     console.log("🗺️ Building token map...");
     tokenMap.clear();
     this.flattenTokens(tokenData, "", tokenMap);

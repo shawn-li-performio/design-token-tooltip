@@ -1,13 +1,19 @@
-import { TokenData } from "./DesignTokenHoverProvider";
+import {
+  DesignTokenHoverProvider,
+  TokenData,
+} from "./DesignTokenHoverProvider";
 
-export class OutputFormatter {
+export class TokenInspector {
+  constructor(private designTokenHoverProvider: DesignTokenHoverProvider) {
+    this.designTokenHoverProvider = designTokenHoverProvider;
+  }
   /**
    * 输出详细的加载结果
    */
-  public static outputLoadingResults(
-    tokenData: TokenData,
-    tokenMap: Map<string, any>,
-  ) {
+  public outputTokenLoadingResults() {
+    const tokenData = this.designTokenHoverProvider.getTokenData();
+    const tokenMap = this.designTokenHoverProvider.getTokenMap();
+
     console.log("\n🎨 ===== DESIGN TOKENS LOADED =====");
     console.log(`📊 Total tokens found: ${tokenMap.size}`);
     console.log("📋 Raw data structure keys:", Object.keys(tokenData));

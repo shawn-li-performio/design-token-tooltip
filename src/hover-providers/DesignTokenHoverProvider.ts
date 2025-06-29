@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { OutputFormatter } from "./OutputFormatter";
+import { TokenInspector } from "./TokenInspector";
 import { TokenParser } from "./TokenParser";
 import { HoverContentFactory } from "./HoverContentFactory";
 
@@ -25,10 +25,12 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   private tokenData: TokenData = {};
   private tokenMap: Map<string, any> = new Map();
   private hoverContentFactory: null | HoverContentFactory = null;
+  private tokenInspector: TokenInspector | null = null;
 
   constructor() {
     this.loadTokenData();
     this.hoverContentFactory = new HoverContentFactory(this);
+    this.tokenInspector = new TokenInspector(this);
 
     // 监听配置变化
     vscode.workspace.onDidChangeConfiguration((e) => {
@@ -99,7 +101,7 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
 
         //! core logic: build the token map to facilitate quick lookup when hovering
         new TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
-        OutputFormatter.outputLoadingResults(this.tokenData, this.tokenMap);
+        this.tokenInspector?.outputTokenLoadingResults();
 
         vscode.window.showInformationMessage(
           `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`,

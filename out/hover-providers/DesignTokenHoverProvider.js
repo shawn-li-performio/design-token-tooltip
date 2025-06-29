@@ -4,7 +4,7 @@ exports.DesignTokenHoverProvider = void 0;
 const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
-const OutputFormatter_1 = require("./OutputFormatter");
+const TokenInspector_1 = require("./TokenInspector");
 const TokenParser_1 = require("./TokenParser");
 const HoverContentFactory_1 = require("./HoverContentFactory");
 /**
@@ -17,8 +17,10 @@ class DesignTokenHoverProvider {
         this.tokenData = {};
         this.tokenMap = new Map();
         this.hoverContentFactory = null;
+        this.tokenInspector = null;
         this.loadTokenData();
         this.hoverContentFactory = new HoverContentFactory_1.HoverContentFactory(this);
+        this.tokenInspector = new TokenInspector_1.TokenInspector(this);
         // 监听配置变化
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration("designToken")) {
@@ -67,7 +69,7 @@ class DesignTokenHoverProvider {
                 console.log("🎯 Raw token data structure:", Object.keys(this.tokenData));
                 //! core logic: build the token map to facilitate quick lookup when hovering
                 new TokenParser_1.TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
-                OutputFormatter_1.OutputFormatter.outputLoadingResults(this.tokenData, this.tokenMap);
+                this.tokenInspector?.outputTokenLoadingResults();
                 vscode.window.showInformationMessage(`✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`);
             }
             else {
