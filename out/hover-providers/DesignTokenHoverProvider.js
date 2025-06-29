@@ -8,8 +8,8 @@ const TokenInspector_1 = require("./TokenInspector");
 const TokenParser_1 = require("./TokenParser");
 const HoverContentFactory_1 = require("./HoverContentFactory");
 /**
- * read token json files - jsonLoader
- * parse raw token into a map - jsonParser
+ * read token json files - tokenLoader
+ * parse raw token into a map - tokenParser
  * provide hover information based on the token map - hoverRenderer, markdownFactory
  */
 class DesignTokenHoverProvider {

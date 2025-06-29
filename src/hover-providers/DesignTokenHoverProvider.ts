@@ -17,8 +17,8 @@ export interface TokenData {
 }
 
 /**
- * read token json files - jsonLoader
- * parse raw token into a map - jsonParser
+ * read token json files - tokenLoader
+ * parse raw token into a map - tokenParser
  * provide hover information based on the token map - hoverRenderer, markdownFactory
  */
 export class DesignTokenHoverProvider implements vscode.HoverProvider {

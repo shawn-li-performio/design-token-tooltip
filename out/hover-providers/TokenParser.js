@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TokenParser = void 0;
+/**
+ * TokenParser: A utility class to parse and flatten design tokens, also includes some token related utilities.
+ */
 class TokenParser {
     /**
-     * 构建 token 映射表，方便快速查找
-     * we made this method stateless
+     *! core logic of design token hover provider:
+     *! build token map from token data to facilitate quick lookups when hovering
+     * @param tokenData - The token data object containing design tokens
+     * @param tokenMap - The map to store flattened tokens
      */
     buildTokenMap(tokenData, tokenMap) {
         console.log("🗺️ Building token map...");
@@ -12,9 +17,6 @@ class TokenParser {
         this.flattenTokens(tokenData, "", tokenMap);
         console.log(`📊 Token map built with ${tokenMap.size} entries`);
     }
-    /**
-     * 判断是否为颜色值
-     */
     static isColor(value) {
         if (typeof value !== "string")
             return false;
@@ -22,7 +24,7 @@ class TokenParser {
         return colorRegex.test(value);
     }
     /**
-     * 查找相关的子 token
+     * look up related sub-tokens based on the base token name
      */
     static findRelatedTokens(tokenName, tokenMap) {
         const related = [];
