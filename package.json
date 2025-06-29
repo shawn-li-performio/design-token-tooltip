@@ -39,6 +39,10 @@
       {
         "command": "designToken.test",
         "title": "Test Design Token Extension"
+      },
+      {
+        "command": "designToken.inspect",
+        "title": "Inspect Design Token Data Loaded"
       }
     ]
   },

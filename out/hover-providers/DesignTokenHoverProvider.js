@@ -4,6 +4,8 @@ exports.DesignTokenHoverProvider = void 0;
 const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
+const OutputFormatter_1 = require("./OutputFormatter");
+const TokenParser_1 = require("./TokenParser");
 class DesignTokenHoverProvider {
     constructor() {
         this.tokenData = {};
@@ -47,6 +49,7 @@ class DesignTokenHoverProvider {
                 }
             }
             console.log("📁 Resolved token file path:", fullPath);
+            // read the file content =========================================
             if (fs.existsSync(fullPath)) {
                 console.log("✅ Token file found, reading content...");
                 const fileContent = fs.readFileSync(fullPath, "utf8");
@@ -54,9 +57,9 @@ class DesignTokenHoverProvider {
                 console.log("📄 File preview (first 200 chars):", fileContent.substring(0, 200) + "...");
                 this.tokenData = JSON.parse(fileContent);
                 console.log("🎯 Raw token data structure:", Object.keys(this.tokenData));
-                this.buildTokenMap();
-                // Output detailed loading results
-                this.outputLoadingResults();
+                //! core logic: build the token map to facilitate quick lookup when hovering
+                new TokenParser_1.TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
+                OutputFormatter_1.OutputFormatter.outputLoadingResults(this.tokenData, this.tokenMap);
                 vscode.window.showInformationMessage(`✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`);
             }
             else {
@@ -75,106 +78,15 @@ class DesignTokenHoverProvider {
         }
     }
     /**
-     * 输出详细的加载结果
-     */
-    outputLoadingResults() {
-        console.log("\n🎨 ===== DESIGN TOKENS LOADED =====");
-        console.log(`📊 Total tokens found: ${this.tokenMap.size}`);
-        console.log("📋 Raw data structure keys:", Object.keys(this.tokenData));
-        // Group tokens by type
-        const tokensByType = {};
-        const tokensByCategory = {};
-        this.tokenMap.forEach((value, key) => {
-            // Group by type
-            const type = value.type || "unknown";
-            if (!tokensByType[type])
-                tokensByType[type] = [];
-            tokensByType[type].push(key);
-            // Group by category (first part of the key)
-            const category = key.split(".")[0] || key.split("-")[0] || "root";
-            if (!tokensByCategory[category])
-                tokensByCategory[category] = [];
-            tokensByCategory[category].push(key);
-        });
-        console.log("\n📂 Tokens by Type:");
-        Object.entries(tokensByType).forEach(([type, tokens]) => {
-            console.log(`  ${type}: ${tokens.length} tokens`);
-            // Show first few examples
-            const examples = tokens.slice(0, 3);
-            examples.forEach((token) => {
-                const value = this.tokenMap.get(token);
-                console.log(`    ├─ ${token}: ${value.value}`);
-            });
-            if (tokens.length > 3) {
-                console.log(`    └─ ... and ${tokens.length - 3} more`);
-            }
-        });
-        console.log("\n🗂️ Tokens by Category:");
-        Object.entries(tokensByCategory).forEach(([category, tokens]) => {
-            console.log(`  ${category}: ${tokens.length} tokens`);
-        });
-        console.log("\n🔍 All Token Names:");
-        const allTokens = Array.from(this.tokenMap.keys()).sort();
-        allTokens.forEach((token, index) => {
-            const value = this.tokenMap.get(token);
-            const valueStr = typeof value.value === "string"
-                ? value.value
-                : JSON.stringify(value.value);
-            console.log(`  ${(index + 1).toString().padStart(3, " ")}. ${token.padEnd(30, " ")} → ${valueStr}`);
-        });
-        console.log("\n✨ Sample Token Details:");
-        const sampleTokens = Array.from(this.tokenMap.entries()).slice(0, 3);
-        sampleTokens.forEach(([key, value]) => {
-            console.log(`🏷️ Token: ${key}`);
-            console.log(`   📝 Full data:`, JSON.stringify(value, null, 2));
-        });
-        console.log("\n🎯 ===== END DESIGN TOKENS =====\n");
-    }
-    /**
-     * 构建 token 映射表，方便快速查找
-     */
-    buildTokenMap() {
-        console.log("🗺️ Building token map...");
-        this.tokenMap.clear();
-        this.flattenTokens(this.tokenData, "");
-        console.log(`📊 Token map built with ${this.tokenMap.size} entries`);
-    }
-    /**
-     * 递归扁平化 token 数据
-     */
-    flattenTokens(obj, prefix) {
-        for (const [key, value] of Object.entries(obj)) {
-            const fullKey = prefix ? `${prefix}.${key}` : key;
-            if (value && typeof value === "object") {
-                // 如果有 value 属性，说明这是一个具体的 token
-                if ("value" in value) {
-                    this.tokenMap.set(fullKey, value);
-                    // 同时支持不同的命名方式
-                    this.tokenMap.set(key, value);
-                    this.tokenMap.set(`--${fullKey.replace(/\./g, "-")}`, value);
-                    this.tokenMap.set(`${fullKey.replace(/\./g, "-")}`, value);
-                    if ("type" in value) {
-                        console.log(`  ✓ Added token: ${fullKey} = ${value.value} (${value.type || "no-type"})`);
-                    }
-                    else {
-                        console.log(`  ✓ Added token: ${fullKey} = ${value.value} (${"no-type"})`);
-                    }
-                }
-                else {
-                    // 递归处理嵌套对象
-                    this.flattenTokens(value, fullKey);
-                }
-            }
-        }
-    }
-    /**
-     * 提供悬停信息
+     * !提供悬停信息 - 必须实现的方法
      */
     provideHover(document, position, token) {
+        // FIXME: get word logic not really works
         const wordRange = document.getWordRangeAtPosition(position, /[\w\-\.]+/);
         if (!wordRange)
             return;
         const word = document.getText(wordRange);
+        console.log("------🔍 Hover triggered for word:", word);
         // 尝试多种 token 命名格式
         const possibleTokens = [
             word,
@@ -186,8 +98,10 @@ class DesignTokenHoverProvider {
         ];
         for (const tokenName of possibleTokens) {
             const tokenInfo = this.tokenMap.get(tokenName);
+            console.log("hovering - ", `🔎 Checking token: ${tokenName}`, tokenInfo);
             if (tokenInfo) {
                 const hoverContent = this.createHoverContent(tokenName, tokenInfo);
+                console.log("hover markdown string:", hoverContent);
                 return new vscode.Hover(hoverContent, wordRange);
             }
         }
@@ -295,6 +209,12 @@ class DesignTokenHoverProvider {
             });
         }
         return examples;
+    }
+    getTokenData() {
+        return this.tokenData;
+    }
+    getTokenMap() {
+        return this.tokenMap;
     }
 }
 exports.DesignTokenHoverProvider = DesignTokenHoverProvider;

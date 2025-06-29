@@ -165,32 +165,37 @@ Developer: Reset Extension Host
 ## 快速测试流程
 
 1. **开发时**：
+
    ```bash
    npm run watch  # 持续编译
-   # F5 启动调试窗口
+   #打开extension.ts时, 按F5 启动调试窗口 (Extension Development Host)
    ```
-   in extension development host interface, run `developer: toggle developer tool` --> see console log results from extension logic in 'console' tab
 
-    in extension development host interface, run below cmd to reload and test the extension
-    ```json
-    "commands": [
-          {
-            "command": "designToken.reload",
-            "title": "Reload Design Tokens"
-          },
-          {
-            "command": "designToken.test",
-            "title": "Test Design Token Extension"
-          }
-        ]
-    ```
+   in extension development host interface, run `developer: toggle developer tool` --> see console log results from extension logic in 'console' tab
+   ![](./assets/toggle-developer-tool.png)
+
+   in extension development host interface, run below cmd to reload and test the extension
+
+   ```json
+   "commands": [
+         {
+           "command": "designToken.reload",
+           "title": "Reload Design Tokens"
+         },
+         {
+           "command": "designToken.test",
+           "title": "Test Design Token Extension"
+         }
+       ]
+   ```
 
 2. **测试功能**：
 
    - 创建一个 CSS 文件
-   - 写入 `color: var(--primary-500);`
-   - 鼠标悬停在 `--primary-500` 上
+   - 写入 `color: "color.primary.500";`
+   - 鼠标悬停在 `"color.primary.500"` 上
    - 应该看到 tooltip 显示
+     ![sample hover 1](./assets/sample-hover-1.png)
 
 3. **修改配置**：
    - 在设置中配置 token 文件路径
