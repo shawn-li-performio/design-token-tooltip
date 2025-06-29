@@ -5,38 +5,14 @@ exports.deactivate = deactivate;
 /// extension.ts - 主入口文件
 const vscode = require("vscode");
 const DesignTokenHoverProvider_1 = require("./hover-providers/DesignTokenHoverProvider");
+const CommandLoader_1 = require("./loaders/CommandLoader");
+const HoverProviderLoader_1 = require("./loaders/HoverProviderLoader");
 function activate(context) {
     console.log("🎨 Design Token Tooltip extension is now active!");
-    // Show a notification to confirm activation
     vscode.window.showInformationMessage("Design Token Tooltip extension activated!");
-    // Register a test command to verify the extension is loaded
-    const testCommand = vscode.commands.registerCommand("designToken.test", () => {
-        vscode.window.showInformationMessage("✅ Design Token extension is working!");
-    });
-    context.subscriptions.push(testCommand);
-    // 注册悬停提供器
     const hoverProvider = new DesignTokenHoverProvider_1.DesignTokenHoverProvider();
-    // 支持多种文件类型
-    const supportedLanguages = [
-        "css",
-        "scss",
-        "less",
-        "javascript",
-        "typescript",
-        "vue",
-        "html",
-    ];
-    supportedLanguages.forEach((language) => {
-        const disposable = vscode.languages.registerHoverProvider(language, hoverProvider);
-        context.subscriptions.push(disposable);
-    });
-    // 注册命令来重新加载 token 数据
-    const reloadCommand = vscode.commands.registerCommand("designToken.reload", () => {
-        console.log("\n🔄 ===== MANUAL RELOAD TRIGGERED =====");
-        hoverProvider.loadTokenData();
-        console.log("🔄 ===== MANUAL RELOAD COMPLETED =====\n");
-    });
-    context.subscriptions.push(reloadCommand);
+    new HoverProviderLoader_1.HoverProviderLoader(context, hoverProvider).load();
+    new CommandLoader_1.CommandLoader(context, hoverProvider).load();
 }
 function deactivate() { }
 // package.json 配置示例
