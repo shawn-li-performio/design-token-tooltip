@@ -16,12 +16,14 @@ class DesignTokenHoverProvider {
     constructor() {
         this.tokenData = {};
         this.tokenMap = new Map();
+        this.semanticTokenData = {};
+        this.semanticTokenMap = new Map();
         this.hoverContentFactory = null;
         this.tokenInspector = null;
         this.loadTokenData();
         this.hoverContentFactory = new HoverContentFactory_1.HoverContentFactory(this);
         this.tokenInspector = new TokenInspector_1.TokenInspector(this);
-        // 监听配置变化
+        // watch for configuration changes
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration("designToken")) {
                 this.loadTokenData();
@@ -29,7 +31,7 @@ class DesignTokenHoverProvider {
         });
     }
     /**
-     * 加载 Design Token 数据
+     * load Design Token data
      */
     loadTokenData() {
         console.log("🔄 Starting to load design tokens...");
@@ -45,7 +47,7 @@ class DesignTokenHoverProvider {
                 vscode.window.showWarningMessage('No design token file path configured. Please set "designToken.filePath" in settings.');
                 return;
             }
-            // 支持相对路径和绝对路径
+            // support both absolute and relative paths
             let fullPath = tokenFilePath;
             if (!path.isAbsolute(tokenFilePath)) {
                 const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -88,20 +90,23 @@ class DesignTokenHoverProvider {
         }
     }
     /**
-     * !提供悬停信息 - 必须实现的方法
+     * ! Provide hover information for design tokens
+     * @param document - The text document being hovered over
+     * @param position - The position of the hover in the document
+     * @param token - The cancellation token
+     * @returns A vscode.Hover object containing the hover information
      */
     provideHover(document, position, token) {
         if (this.hoverContentFactory === null) {
             console.error("❌ HoverContentFactory is not initialized");
             return;
         }
-        // FIXME: get word logic not really works
         const wordRange = document.getWordRangeAtPosition(position, /[\w\-\.]+/);
         if (!wordRange)
             return;
         const word = document.getText(wordRange);
         console.log("------🔍 Hover triggered for word:", word);
-        // 尝试多种 token 命名格式
+        // Check if the word is a valid token name
         const possibleTokens = [
             word,
             `--${word}`,
@@ -126,6 +131,12 @@ class DesignTokenHoverProvider {
     }
     getTokenMap() {
         return this.tokenMap;
+    }
+    getSemanticTokenData() {
+        return this.semanticTokenData;
+    }
+    getSemanticTokenMap() {
+        return this.semanticTokenMap;
     }
 }
 exports.DesignTokenHoverProvider = DesignTokenHoverProvider;

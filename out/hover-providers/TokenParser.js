@@ -39,19 +39,19 @@ class TokenParser {
                 });
             }
         }
-        return related.slice(0, 5); // 限制显示数量
+        return related.slice(0, 5); // limit to 5 related tokens for display
     }
     /**
-     * 递归扁平化 token 数据
+     * recursively flatten token data
      */
     flattenTokens(obj, prefix, tokenMap) {
         for (const [key, value] of Object.entries(obj)) {
             const fullKey = prefix ? `${prefix}.${key}` : key;
             if (value && typeof value === "object") {
-                // 如果有 value 属性，说明这是一个具体的 token
+                // if there is a value property, treat it as a valid token
                 if ("value" in value) {
                     tokenMap.set(fullKey, value);
-                    // 同时支持不同的命名方式
+                    // support different naming conventions
                     tokenMap.set(key, value);
                     tokenMap.set(`--${fullKey.replace(/\./g, "-")}`, value);
                     tokenMap.set(`${fullKey.replace(/\./g, "-")}`, value);
@@ -63,7 +63,7 @@ class TokenParser {
                     }
                 }
                 else {
-                    // 递归处理嵌套对象
+                    // recursively flatten nested objects
                     this.flattenTokens(value, fullKey, tokenMap);
                 }
             }

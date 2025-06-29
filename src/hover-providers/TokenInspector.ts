@@ -8,7 +8,7 @@ export class TokenInspector {
     this.designTokenHoverProvider = designTokenHoverProvider;
   }
   /**
-   * 输出详细的加载结果
+   * log detailed information about loaded design tokens
    */
   public outputTokenLoadingResults() {
     const tokenData = this.designTokenHoverProvider.getTokenData();

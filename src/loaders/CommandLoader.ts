@@ -14,7 +14,7 @@ export class CommandLoader implements Loader {
   }
 
   public load() {
-    // 注册命令来重新加载 token 数据
+    // register command to reload token data
     const reloadCommand = vscode.commands.registerCommand(
       "designToken.reload",
       () => {

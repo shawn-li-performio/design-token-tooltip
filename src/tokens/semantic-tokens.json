@@ -1,0 +1,77 @@
+{
+  "forms": {
+    "inputs": {
+      "padding-inline": {
+        "value": "{spacing.xs}",
+        "type": "spacing",
+        "description": "Horizontal padding for input fields"
+      },
+      "padding-block": {
+        "value": "{spacing.sm}",
+        "type": "spacing",
+        "description": "Vertical padding for input fields"
+      },
+      "background": {
+        "value": "{color.primary.50}",
+        "type": "color",
+        "description": "Background color for input fields"
+      },
+      "border-color": {
+        "value": "{color.primary.500}",
+        "type": "color",
+        "description": "Border color for input fields"
+      },
+      "font-size": {
+        "value": "{typography.fontSize.base}",
+        "type": "fontSize",
+        "description": "Font size for input text"
+      }
+    }
+  },
+  "buttons": {
+    "primary": {
+      "background": {
+        "value": "{color.primary.500}",
+        "type": "color",
+        "description": "Background color for primary buttons"
+      },
+      "color": {
+        "value": "{color.primary.50}",
+        "type": "color",
+        "description": "Text color for primary buttons"
+      },
+      "padding-inline": {
+        "value": "{spacing.sm}",
+        "type": "spacing",
+        "description": "Horizontal padding for primary buttons"
+      },
+      "padding-block": {
+        "value": "{spacing.md}",
+        "type": "spacing",
+        "description": "Vertical padding for primary buttons"
+      }
+    },
+    "secondary": {
+      "background": {
+        "value": "{color.primary.50}",
+        "type": "color",
+        "description": "Background color for secondary buttons"
+      },
+      "color": {
+        "value": "{color.primary.900}",
+        "type": "color",
+        "description": "Text color for secondary buttons"
+      },
+      "padding-inline": {
+        "value": "{spacing.sm}",
+        "type": "spacing",
+        "description": "Horizontal padding for secondary buttons"
+      },
+      "padding-block": {
+        "value": "{spacing.md}",
+        "type": "spacing",
+        "description": "Vertical padding for secondary buttons"
+      }
+    }
+  }
+}

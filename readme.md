@@ -1,19 +1,19 @@
-## 开发和测试阶段
+## Development and Testing
 
-### 1. 设置开发环境
+### 1. Set Up Development Environment
 
 ```bash
-# 创建插件目录
+# Create extension directory
 mkdir design-token-tooltip
 cd design-token-tooltip
 
-# 初始化项目
+# Initialize project
 npm init -y
 
-# 安装依赖
+# Install dependencies
 npm install --save-dev @types/vscode @types/node typescript
 
-# 创建 TypeScript 配置
+# Create TypeScript config
 echo '{
   "compilerOptions": {
     "module": "commonjs",
@@ -27,104 +27,104 @@ echo '{
 }' > tsconfig.json
 ```
 
-### 2. 项目结构
+### 2. Project Structure
 
 ```
 design-token-tooltip/
 ├── src/
-│   └── extension.ts        # 主代码文件
-├── package.json           # 插件配置
-├── tsconfig.json         # TypeScript配置
-└── tokens.json           # 示例token数据
+│   └── extension.ts        # Main code file
+├── package.json           # Extension config
+├── tsconfig.json         # TypeScript config
+└── tokens.json           # Example token data
 ```
 
-### 3. 启动开发模式
+### 3. Start Development Mode
 
 ```bash
-# 编译代码
+# Compile code
 npx tsc -p ./
 
-# 或者监听模式（推荐）
+# Or watch mode (recommended)
 npx tsc -watch -p ./
 ```
 
-### 4. 在 VSCode 中测试
+### 4. Test in VSCode
 
-1. 在 VSCode 中打开插件项目文件夹
-2. 按 `F5` 或 `Ctrl+F5` 启动调试
-3. 这会打开一个新的 "Extension Development Host" 窗口
-4. 在新窗口中，插件会自动激活
+1. Open the extension project folder in VSCode
+2. Press `F5` or `Ctrl+F5` to start debugging
+3. This opens a new "Extension Development Host" window
+4. The extension will auto-activate in the new window
 
-## 插件的启动和关闭
+## Extension Activation and Deactivation
 
-### 自动启动
+### Auto Activation
 
-插件会在以下情况自动启动：
+The extension auto-activates when:
 
-- 打开支持的文件类型（CSS、SCSS、JS、TS、Vue、HTML）
-- VSCode 启动时（如果之前使用过）
+- Supported file types are opened (CSS, SCSS, JS, TS, Vue, HTML)
+- VSCode starts (if previously used)
 
-### 手动控制
+### Manual Control
 
-#### 查看插件状态
+#### View Extension Status
 
-1. 打开命令面板：`Ctrl+Shift+P` (Windows/Linux) 或 `Cmd+Shift+P` (Mac)
-2. 输入 "Extensions: Show Running Extensions"
-3. 可以看到当前运行的所有插件
+1. Open Command Palette: `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
+2. Enter "Extensions: Show Running Extensions"
+3. You can see all running extensions
 
-#### 重新加载插件
+#### Reload Extension
 
 ```bash
-# 命令面板中执行
+# In Command Palette
 Developer: Reload Window
 ```
 
-#### 禁用插件
+#### Disable Extension
 
-1. 打开扩展面板：`Ctrl+Shift+X`
-2. 找到你的插件
-3. 点击"禁用"按钮
+1. Open Extensions panel: `Ctrl+Shift+X`
+2. Find your extension
+3. Click the "Disable" button
 
-#### 重新加载 Token 数据
+#### Reload Token Data
 
 ```bash
-# 命令面板中执行
+# In Command Palette
 Design Token: Reload Design Tokens
 ```
 
-## 生产环境部署
+## Production Deployment
 
-### 打包插件
+### Package Extension
 
 ```bash
-# 安装打包工具
+# Install packaging tool
 npm install -g vsce
 
-# 打包成 .vsix 文件
+# Package as .vsix file
 vsce package
 ```
 
-### 安装打包后的插件
+### Install Packaged Extension
 
 ```bash
-# 从 .vsix 文件安装
+# Install from .vsix file
 code --install-extension design-token-tooltip-0.0.1.vsix
 ```
 
-### 卸载插件
+### Uninstall Extension
 
 ```bash
-# 命令行卸载
+# Uninstall from command line
 code --uninstall-extension your-publisher.design-token-tooltip
 
-# 或在 VSCode 扩展面板中点击卸载
+# Or click uninstall in VSCode Extensions panel
 ```
 
-## 配置管理
+## Configuration Management
 
-### 工作区配置
+### Workspace Configuration
 
-在项目根目录创建 `.vscode/settings.json`：
+Create `.vscode/settings.json` in the project root:
 
 ```json
 {
@@ -132,9 +132,9 @@ code --uninstall-extension your-publisher.design-token-tooltip
 }
 ```
 
-### 用户配置
+### User Configuration
 
-在 VSCode 设置中添加：
+Add in VSCode settings:
 
 ```json
 {
@@ -142,39 +142,39 @@ code --uninstall-extension your-publisher.design-token-tooltip
 }
 ```
 
-## 调试和日志
+## Debugging and Logs
 
-### 查看插件日志
+### View Extension Logs
 
-1. 打开开发者工具：`Help > Toggle Developer Tools`
-2. 在 Console 中查看插件的 `console.log` 输出
+1. Open Developer Tools: `Help > Toggle Developer Tools`
+2. Check the extension's `console.log` output in the Console tab
 
-### 常用调试命令
+### Common Debug Commands
 
 ```bash
-# 重启 VSCode
+# Restart VSCode
 Developer: Reload Window
 
-# 查看插件状态
+# View extension status
 Developer: Show Running Extensions
 
-# 清除扩展缓存
+# Clear extension cache
 Developer: Reset Extension Host
 ```
 
-## 快速测试流程
+## Quick Test Workflow
 
-1. **开发时**：
+1. **During development:**
 
    ```bash
-   npm run watch  # 持续编译
-   #打开extension.ts时, 按F5 启动调试窗口 (Extension Development Host)
+   npm run watch  # Continuous compilation
+   # Open extension.ts, press F5 to start debug window (Extension Development Host)
    ```
 
-   in extension development host interface, run `developer: toggle developer tool` --> see console log results from extension logic in 'console' tab
+   In the Extension Development Host interface, run `Developer: Toggle Developer Tools` → see console log results from extension logic in the 'Console' tab
    ![](./assets/toggle-developer-tool.png)
 
-   in extension development host interface, run below cmd to reload and test the extension
+   In the Extension Development Host interface, run the following command to reload and test the extension:
 
    ```json
    "commands": [
@@ -189,14 +189,14 @@ Developer: Reset Extension Host
        ]
    ```
 
-2. **测试功能**：
+2. **Test functionality:**
 
-   - 创建一个 CSS 文件
-   - 写入 `color: "color.primary.500";`
-   - 鼠标悬停在 `"color.primary.500"` 上
-   - 应该看到 tooltip 显示
+   - Create a CSS file
+   - Write `color: "color.primary.500";`
+   - Hover over `"color.primary.500"`
+   - You should see a tooltip
      ![sample hover 1](./assets/sample-hover-1.png)
 
-3. **修改配置**：
-   - 在设置中配置 token 文件路径
-   - 使用 `Ctrl+Shift+P` → "Reload Design Tokens" 重新加载
+3. **Modify configuration:**
+   - Configure the token file path in settings
+   - Use `Ctrl+Shift+P` → "Reload Design Tokens" to reload

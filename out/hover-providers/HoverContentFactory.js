@@ -24,10 +24,10 @@ class HoverContentFactory {
         }
         if (TokenParser_1.TokenParser.isColor(tokenInfo.value)) {
             const colorValue = tokenInfo.value;
-            // 使用 VSCode 支持的 markdown 颜色块语法预览颜色
+            // use a span to show color preview
             markdown.appendMarkdown(`**Color Preview:** <span style="display:inline-block;width:16px;height:16px;border-radius:3px;border:1px solid #ccc;background:${colorValue};vertical-align:middle;margin-right:4px;"></span> \`${colorValue}\`\n\n`);
         }
-        //! 相关子 token（如果存在）
+        //! related child tokens
         const relatedTokens = TokenParser_1.TokenParser.findRelatedTokens(tokenName, this.designTokenHoverProvider.getTokenMap());
         if (relatedTokens.length > 0) {
             markdown.appendMarkdown(`**Related Tokens:**\n`);
@@ -36,7 +36,6 @@ class HoverContentFactory {
             });
             markdown.appendMarkdown(`\n`);
         }
-        // 使用示例
         if (this.shouldDisplayUsageExamples) {
             const examples = this.generateUsageExamples(tokenName, tokenInfo);
             if (examples.length > 0) {
@@ -48,9 +47,6 @@ class HoverContentFactory {
         }
         return markdown;
     }
-    /**
-     * 生成使用示例
-     */
     generateUsageExamples(tokenName, tokenInfo) {
         const examples = [];
         const cssVarName = `--${tokenName
@@ -59,17 +55,17 @@ class HoverContentFactory {
         const scssVarName = `$${tokenName
             .replace(/^(--|\$)/, "")
             .replace(/\./g, "-")}`;
-        // CSS 示例
+        // CSS example
         examples.push({
             code: `.my-element {\n  color: var(${cssVarName});\n}`,
             language: "css",
         });
-        // SCSS 示例
+        // SCSS example
         examples.push({
             code: `.my-element {\n  color: ${scssVarName};\n}`,
             language: "scss",
         });
-        // JavaScript 示例（如果适用）
+        // JavaScript example (if applicable)
         if (tokenInfo.type === "color" || TokenParser_1.TokenParser.isColor(tokenInfo.value)) {
             examples.push({
                 code: `const primaryColor = tokens.${tokenName

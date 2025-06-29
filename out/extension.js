@@ -15,7 +15,7 @@ function activate(context) {
     new CommandLoader_1.CommandLoader(context, hoverProvider).load();
 }
 function deactivate() { }
-// package.json 配置示例
+// package.json config example
 /*
 {
   "name": "design-token-tooltip",

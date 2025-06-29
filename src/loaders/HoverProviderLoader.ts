@@ -24,7 +24,7 @@ export class HoverProviderLoader implements Loader {
   }
 
   public load() {
-    // 为支持的语言注册悬停提供器
+    // register hover provider for supported languages
     SUPPORTED_LANGUAGES.forEach((language) => {
       const disposable = vscode.languages.registerHoverProvider(
         language,

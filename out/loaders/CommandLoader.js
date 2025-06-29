@@ -11,7 +11,7 @@ class CommandLoader {
         console.log("🎨 Design Token Tooltip Command Loader initialized!");
     }
     load() {
-        // 注册命令来重新加载 token 数据
+        // register command to reload token data
         const reloadCommand = vscode.commands.registerCommand("designToken.reload", () => {
             console.log("\n🔄 ===== MANUAL RELOAD TRIGGERED =====");
             this.hoverProvider.loadTokenData();

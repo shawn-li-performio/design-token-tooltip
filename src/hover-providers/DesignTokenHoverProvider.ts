@@ -24,6 +24,9 @@ export interface TokenData {
 export class DesignTokenHoverProvider implements vscode.HoverProvider {
   private tokenData: TokenData = {};
   private tokenMap: Map<string, any> = new Map();
+  private semanticTokenData: any = {};
+  private semanticTokenMap: Map<string, any> = new Map();
+
   private hoverContentFactory: null | HoverContentFactory = null;
   private tokenInspector: TokenInspector | null = null;
 
@@ -32,7 +35,7 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
     this.hoverContentFactory = new HoverContentFactory(this);
     this.tokenInspector = new TokenInspector(this);
 
-    // 监听配置变化
+    // watch for configuration changes
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("designToken")) {
         this.loadTokenData();
@@ -41,7 +44,7 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   }
 
   /**
-   * 加载 Design Token 数据
+   * load Design Token data
    */
   loadTokenData() {
     console.log("🔄 Starting to load design tokens...");
@@ -65,7 +68,7 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
         return;
       }
 
-      // 支持相对路径和绝对路径
+      // support both absolute and relative paths
       let fullPath = tokenFilePath;
       if (!path.isAbsolute(tokenFilePath)) {
         const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -125,7 +128,11 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   }
 
   /**
-   * !提供悬停信息 - 必须实现的方法
+   * ! Provide hover information for design tokens
+   * @param document - The text document being hovered over
+   * @param position - The position of the hover in the document
+   * @param token - The cancellation token
+   * @returns A vscode.Hover object containing the hover information
    */
   provideHover(
     document: vscode.TextDocument,
@@ -137,7 +144,6 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
       return;
     }
 
-    // FIXME: get word logic not really works
     const wordRange = document.getWordRangeAtPosition(position, /[\w\-\.]+/);
     if (!wordRange) return;
 
@@ -145,7 +151,7 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
 
     console.log("------🔍 Hover triggered for word:", word);
 
-    // 尝试多种 token 命名格式
+    // Check if the word is a valid token name
     const possibleTokens = [
       word,
       `--${word}`,
@@ -176,5 +182,12 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   }
   public getTokenMap(): Map<string, any> {
     return this.tokenMap;
+  }
+
+  public getSemanticTokenData(): any {
+    return this.semanticTokenData;
+  }
+  public getSemanticTokenMap(): Map<string, any> {
+    return this.semanticTokenMap;
   }
 }

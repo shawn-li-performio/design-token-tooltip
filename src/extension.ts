@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-// package.json 配置示例
+// package.json config example
 /*
 {
   "name": "design-token-tooltip",
