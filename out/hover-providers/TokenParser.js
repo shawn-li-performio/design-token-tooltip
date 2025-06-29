@@ -13,6 +13,33 @@ class TokenParser {
         console.log(`📊 Token map built with ${tokenMap.size} entries`);
     }
     /**
+     * 判断是否为颜色值
+     */
+    static isColor(value) {
+        if (typeof value !== "string")
+            return false;
+        const colorRegex = /^(#[0-9a-fA-F]{3,8}|rgb\(|rgba\(|hsl\(|hsla\()/;
+        return colorRegex.test(value);
+    }
+    /**
+     * 查找相关的子 token
+     */
+    static findRelatedTokens(tokenName, tokenMap) {
+        const related = [];
+        const baseTokenName = tokenName.replace(/^(--|\$)/, "").replace(/-/g, ".");
+        for (const [key, value] of tokenMap.entries()) {
+            if (key !== tokenName &&
+                key.includes(baseTokenName) &&
+                key !== baseTokenName) {
+                related.push({
+                    name: key,
+                    value: value.value || value,
+                });
+            }
+        }
+        return related.slice(0, 5); // 限制显示数量
+    }
+    /**
      * 递归扁平化 token 数据
      */
     flattenTokens(obj, prefix, tokenMap) {

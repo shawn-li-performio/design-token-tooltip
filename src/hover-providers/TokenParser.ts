@@ -13,6 +13,42 @@ export class TokenParser {
   }
 
   /**
+   * 判断是否为颜色值
+   */
+  static isColor(value: any): boolean {
+    if (typeof value !== "string") return false;
+
+    const colorRegex = /^(#[0-9a-fA-F]{3,8}|rgb\(|rgba\(|hsl\(|hsla\()/;
+    return colorRegex.test(value);
+  }
+
+  /**
+   * 查找相关的子 token
+   */
+  public static findRelatedTokens(
+    tokenName: string,
+    tokenMap: Map<string, any>,
+  ): Array<{ name: string; value: any }> {
+    const related: Array<{ name: string; value: any }> = [];
+    const baseTokenName = tokenName.replace(/^(--|\$)/, "").replace(/-/g, ".");
+
+    for (const [key, value] of tokenMap.entries()) {
+      if (
+        key !== tokenName &&
+        key.includes(baseTokenName) &&
+        key !== baseTokenName
+      ) {
+        related.push({
+          name: key,
+          value: value.value || value,
+        });
+      }
+    }
+
+    return related.slice(0, 5); // 限制显示数量
+  }
+
+  /**
    * 递归扁平化 token 数据
    */
   private flattenTokens(obj: any, prefix: string, tokenMap: Map<string, any>) {

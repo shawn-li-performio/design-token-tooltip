@@ -6,11 +6,19 @@ const fs = require("fs");
 const path = require("path");
 const OutputFormatter_1 = require("./OutputFormatter");
 const TokenParser_1 = require("./TokenParser");
+const HoverContentFactory_1 = require("./HoverContentFactory");
+/**
+ * read token json files - jsonLoader
+ * parse raw token into a map - jsonParser
+ * provide hover information based on the token map - hoverRenderer, markdownFactory
+ */
 class DesignTokenHoverProvider {
     constructor() {
         this.tokenData = {};
         this.tokenMap = new Map();
+        this.hoverContentFactory = null;
         this.loadTokenData();
+        this.hoverContentFactory = new HoverContentFactory_1.HoverContentFactory(this);
         // 监听配置变化
         vscode.workspace.onDidChangeConfiguration((e) => {
             if (e.affectsConfiguration("designToken")) {
@@ -81,6 +89,10 @@ class DesignTokenHoverProvider {
      * !提供悬停信息 - 必须实现的方法
      */
     provideHover(document, position, token) {
+        if (this.hoverContentFactory === null) {
+            console.error("❌ HoverContentFactory is not initialized");
+            return;
+        }
         // FIXME: get word logic not really works
         const wordRange = document.getWordRangeAtPosition(position, /[\w\-\.]+/);
         if (!wordRange)
@@ -100,115 +112,12 @@ class DesignTokenHoverProvider {
             const tokenInfo = this.tokenMap.get(tokenName);
             console.log("hovering - ", `🔎 Checking token: ${tokenName}`, tokenInfo);
             if (tokenInfo) {
-                const hoverContent = this.createHoverContent(tokenName, tokenInfo);
+                const hoverContent = this.hoverContentFactory.createHoverContent(tokenName, tokenInfo);
                 console.log("hover markdown string:", hoverContent);
                 return new vscode.Hover(hoverContent, wordRange);
             }
         }
         return null;
-    }
-    /**
-     * 创建悬停内容
-     */
-    createHoverContent(tokenName, tokenInfo) {
-        const markdown = new vscode.MarkdownString();
-        markdown.supportHtml = true;
-        // 标题
-        markdown.appendMarkdown(`### 🎨 Design Token: \`${tokenName}\`\n\n`);
-        // 主要值
-        if (tokenInfo.value !== undefined) {
-            markdown.appendMarkdown(`**Value:** \`${tokenInfo.value}\`\n\n`);
-        }
-        // 类型信息
-        if (tokenInfo.type) {
-            markdown.appendMarkdown(`**Type:** ${tokenInfo.type}\n\n`);
-        }
-        // 描述
-        if (tokenInfo.description) {
-            markdown.appendMarkdown(`**Description:** ${tokenInfo.description}\n\n`);
-        }
-        // 如果是颜色，显示颜色预览
-        if (this.isColor(tokenInfo.value)) {
-            const colorValue = tokenInfo.value;
-            markdown.appendMarkdown(`**Color Preview:** <span style="display:inline-block;width:20px;height:20px;background-color:${colorValue};border:1px solid #ccc;border-radius:3px;margin-left:8px;vertical-align:middle;"></span>\n\n`);
-        }
-        // 相关子 token（如果存在）
-        const relatedTokens = this.findRelatedTokens(tokenName);
-        if (relatedTokens.length > 0) {
-            markdown.appendMarkdown(`**Related Tokens:**\n`);
-            relatedTokens.forEach((related) => {
-                markdown.appendMarkdown(`- \`${related.name}\`: ${related.value}\n`);
-            });
-            markdown.appendMarkdown(`\n`);
-        }
-        // 使用示例
-        const examples = this.generateUsageExamples(tokenName, tokenInfo);
-        if (examples.length > 0) {
-            markdown.appendMarkdown(`**Usage Examples:**\n`);
-            examples.forEach((example) => {
-                markdown.appendCodeblock(example.code, example.language);
-            });
-        }
-        return markdown;
-    }
-    /**
-     * 判断是否为颜色值
-     */
-    isColor(value) {
-        if (typeof value !== "string")
-            return false;
-        const colorRegex = /^(#[0-9a-fA-F]{3,8}|rgb\(|rgba\(|hsl\(|hsla\()/;
-        return colorRegex.test(value);
-    }
-    /**
-     * 查找相关的子 token
-     */
-    findRelatedTokens(tokenName) {
-        const related = [];
-        const baseTokenName = tokenName.replace(/^(--|\$)/, "").replace(/-/g, ".");
-        for (const [key, value] of this.tokenMap.entries()) {
-            if (key !== tokenName &&
-                key.includes(baseTokenName) &&
-                key !== baseTokenName) {
-                related.push({
-                    name: key,
-                    value: value.value || value,
-                });
-            }
-        }
-        return related.slice(0, 5); // 限制显示数量
-    }
-    /**
-     * 生成使用示例
-     */
-    generateUsageExamples(tokenName, tokenInfo) {
-        const examples = [];
-        const cssVarName = `--${tokenName
-            .replace(/^(--|\$)/, "")
-            .replace(/\./g, "-")}`;
-        const scssVarName = `$${tokenName
-            .replace(/^(--|\$)/, "")
-            .replace(/\./g, "-")}`;
-        // CSS 示例
-        examples.push({
-            code: `.my-element {\n  color: var(${cssVarName});\n}`,
-            language: "css",
-        });
-        // SCSS 示例
-        examples.push({
-            code: `.my-element {\n  color: ${scssVarName};\n}`,
-            language: "scss",
-        });
-        // JavaScript 示例（如果适用）
-        if (tokenInfo.type === "color" || this.isColor(tokenInfo.value)) {
-            examples.push({
-                code: `const primaryColor = tokens.${tokenName
-                    .replace(/^(--|\$)/, "")
-                    .replace(/-/g, ".")};\n// Usage: ${tokenInfo.value}`,
-                language: "javascript",
-            });
-        }
-        return examples;
     }
     getTokenData() {
         return this.tokenData;
