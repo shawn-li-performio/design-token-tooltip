@@ -1,15 +1,55 @@
 {
   "name": "design-token-tooltip",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "displayName": "Design Token Tooltip",
+  "description": "Show design token information on hover",
+  "version": "0.0.1",
+  "publisher": "shawn",
+  "engines": {
+    "vscode": "^1.74.0"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:vue",
+    "onLanguage:html"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Design Token Tooltip",
+      "properties": {
+        "designToken.filePath": {
+          "type": "string",
+          "default": "tokens.json",
+          "description": "Path to the design tokens JSON file (relative to workspace root or absolute path)"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "designToken.reload",
+        "title": "Reload Design Tokens"
+      },
+      {
+        "command": "designToken.test",
+        "title": "Test Design Token Extension"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
   "devDependencies": {
     "@types/node": "^24.0.7",
     "@types/vscode": "^1.101.0",
