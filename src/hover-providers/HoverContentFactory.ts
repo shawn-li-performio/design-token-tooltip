@@ -11,25 +11,38 @@ export class HoverContentFactory {
   }
 
   createHoverContent(tokenName: string, tokenInfo: any): vscode.MarkdownString {
-    const markdown = new vscode.MarkdownString();
-    markdown.supportHtml = true;
-
+    const markdown = new vscode.MarkdownString(undefined, true);
+    markdown.isTrusted = true;
 
     markdown.appendMarkdown(`### 🎨 Design Token: \`${tokenName}\`\n\n`);
-    if (tokenInfo.value !== undefined) {
-      markdown.appendMarkdown(`**Value:** \`${tokenInfo.value}\`\n\n`);
-    }
-    if (tokenInfo.type) {
-      markdown.appendMarkdown(`**Type:** ${tokenInfo.type}\n\n`);
-    }
-    if (tokenInfo.description) {
-      markdown.appendMarkdown(`**Description:** ${tokenInfo.description}\n\n`);
-    }
+    // Display token info as a JSON code snippet for hierarchical support
+    const tokenJson = JSON.stringify(tokenInfo, null, 2);
+    markdown.appendCodeblock(tokenJson, "json");
+
+    // nested token info ======================================================================
+    const fakeChildToken = {
+      name: tokenName,
+      value: tokenInfo.value,
+      type: tokenInfo.type,
+      description: tokenInfo.description,
+    };
+    markdown.appendMarkdown(`> **\`${fakeChildToken.name}\`:**\n`);
+    markdown.appendMarkdown(`> \`\`\`json\n`);
+    markdown.appendMarkdown(
+      `> ${JSON.stringify(fakeChildToken, null, 2).replace(/\n/g, "\n> ")}\n`,
+    );
+    markdown.appendMarkdown(`> \`\`\`\n\n`);
+    // nested token info =====================================================================
+
 
     if (TokenParser.isColor(tokenInfo.value)) {
       const colorValue = tokenInfo.value;
-      // use a span to show color preview
-      markdown.appendMarkdown(`**Color Preview:** <span style="display:inline-block;width:16px;height:16px;border-radius:3px;border:1px solid #ccc;background:${colorValue};vertical-align:middle;margin-right:4px;"></span> \`${colorValue}\`\n\n`);
+      // Use a Markdown image with a data URI SVG for color preview
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" rx="3" fill="${colorValue}" stroke="#ccc" /></svg>`;
+      const encodedSvg = encodeURIComponent(svg);
+      markdown.appendMarkdown(
+        `**Color Preview:** ![color](data:image/svg+xml;utf8,${encodedSvg}) \`${colorValue}\`\n\n`,
+      );
     }
 
     //! related child tokens
