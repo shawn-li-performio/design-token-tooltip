@@ -1,6 +1,7 @@
 ## 开发和测试阶段
 
 ### 1. 设置开发环境
+
 ```bash
 # 创建插件目录
 mkdir design-token-tooltip
@@ -27,6 +28,7 @@ echo '{
 ```
 
 ### 2. 项目结构
+
 ```
 design-token-tooltip/
 ├── src/
@@ -37,6 +39,7 @@ design-token-tooltip/
 ```
 
 ### 3. 启动开发模式
+
 ```bash
 # 编译代码
 npx tsc -p ./
@@ -46,6 +49,7 @@ npx tsc -watch -p ./
 ```
 
 ### 4. 在 VSCode 中测试
+
 1. 在 VSCode 中打开插件项目文件夹
 2. 按 `F5` 或 `Ctrl+F5` 启动调试
 3. 这会打开一个新的 "Extension Development Host" 窗口
@@ -54,29 +58,35 @@ npx tsc -watch -p ./
 ## 插件的启动和关闭
 
 ### 自动启动
+
 插件会在以下情况自动启动：
+
 - 打开支持的文件类型（CSS、SCSS、JS、TS、Vue、HTML）
 - VSCode 启动时（如果之前使用过）
 
 ### 手动控制
 
 #### 查看插件状态
+
 1. 打开命令面板：`Ctrl+Shift+P` (Windows/Linux) 或 `Cmd+Shift+P` (Mac)
 2. 输入 "Extensions: Show Running Extensions"
 3. 可以看到当前运行的所有插件
 
 #### 重新加载插件
+
 ```bash
 # 命令面板中执行
 Developer: Reload Window
 ```
 
 #### 禁用插件
+
 1. 打开扩展面板：`Ctrl+Shift+X`
 2. 找到你的插件
 3. 点击"禁用"按钮
 
 #### 重新加载 Token 数据
+
 ```bash
 # 命令面板中执行
 Design Token: Reload Design Tokens
@@ -85,6 +95,7 @@ Design Token: Reload Design Tokens
 ## 生产环境部署
 
 ### 打包插件
+
 ```bash
 # 安装打包工具
 npm install -g vsce
@@ -94,12 +105,14 @@ vsce package
 ```
 
 ### 安装打包后的插件
+
 ```bash
 # 从 .vsix 文件安装
 code --install-extension design-token-tooltip-0.0.1.vsix
 ```
 
 ### 卸载插件
+
 ```bash
 # 命令行卸载
 code --uninstall-extension your-publisher.design-token-tooltip
@@ -110,7 +123,9 @@ code --uninstall-extension your-publisher.design-token-tooltip
 ## 配置管理
 
 ### 工作区配置
+
 在项目根目录创建 `.vscode/settings.json`：
+
 ```json
 {
   "designToken.filePath": "./src/tokens/design-tokens.json"
@@ -118,7 +133,9 @@ code --uninstall-extension your-publisher.design-token-tooltip
 ```
 
 ### 用户配置
+
 在 VSCode 设置中添加：
+
 ```json
 {
   "designToken.filePath": "/path/to/your/tokens.json"
@@ -128,10 +145,12 @@ code --uninstall-extension your-publisher.design-token-tooltip
 ## 调试和日志
 
 ### 查看插件日志
+
 1. 打开开发者工具：`Help > Toggle Developer Tools`
 2. 在 Console 中查看插件的 `console.log` 输出
 
 ### 常用调试命令
+
 ```bash
 # 重启 VSCode
 Developer: Reload Window
@@ -150,8 +169,24 @@ Developer: Reset Extension Host
    npm run watch  # 持续编译
    # F5 启动调试窗口
    ```
+   in extension development host interface, run `developer: toggle developer tool` --> see console log results from extension logic in 'console' tab
+
+    in extension development host interface, run below cmd to reload and test the extension
+    ```json
+    "commands": [
+          {
+            "command": "designToken.reload",
+            "title": "Reload Design Tokens"
+          },
+          {
+            "command": "designToken.test",
+            "title": "Test Design Token Extension"
+          }
+        ]
+    ```
 
 2. **测试功能**：
+
    - 创建一个 CSS 文件
    - 写入 `color: var(--primary-500);`
    - 鼠标悬停在 `--primary-500` 上
