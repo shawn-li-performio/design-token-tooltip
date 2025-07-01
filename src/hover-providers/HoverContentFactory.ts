@@ -19,6 +19,16 @@ export class HoverContentFactory {
     const tokenJson = JSON.stringify(tokenInfo, null, 2);
     markdown.appendCodeblock(tokenJson, "json");
 
+    if (TokenParser.isColor(tokenInfo.value)) {
+      const colorValue = tokenInfo.value;
+      // Use a Markdown image with a data URI SVG for color preview
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" rx="3" fill="${colorValue}" stroke="#ccc" /></svg>`;
+      const encodedSvg = encodeURIComponent(svg);
+      markdown.appendMarkdown(
+        `**Color Preview:** ![color](data:image/svg+xml;utf8,${encodedSvg}) \`${colorValue}\`\n\n`,
+      );
+    }
+
     // nested token info ======================================================================
     const fakeChildToken = {
       name: tokenName,
@@ -35,15 +45,7 @@ export class HoverContentFactory {
     // nested token info =====================================================================
 
 
-    if (TokenParser.isColor(tokenInfo.value)) {
-      const colorValue = tokenInfo.value;
-      // Use a Markdown image with a data URI SVG for color preview
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" rx="3" fill="${colorValue}" stroke="#ccc" /></svg>`;
-      const encodedSvg = encodeURIComponent(svg);
-      markdown.appendMarkdown(
-        `**Color Preview:** ![color](data:image/svg+xml;utf8,${encodedSvg}) \`${colorValue}\`\n\n`,
-      );
-    }
+
 
     //! related child tokens
     const relatedTokens = TokenParser.findRelatedTokens(
