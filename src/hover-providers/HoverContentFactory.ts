@@ -15,10 +15,8 @@ export class HoverContentFactory {
     markdown.isTrusted = true;
 
     markdown.appendMarkdown(`### 🎨 Design Token: \`${tokenName}\`\n\n`);
-    // Display token info as a JSON code snippet for hierarchical support
-    const tokenJson = JSON.stringify(tokenInfo, null, 2);
-    markdown.appendCodeblock(tokenJson, "json");
 
+    // color preview
     if (TokenParser.isColor(tokenInfo.value)) {
       const colorValue = tokenInfo.value;
       // Use a Markdown image with a data URI SVG for color preview
@@ -28,6 +26,13 @@ export class HoverContentFactory {
         `**Color Preview:** ![color](data:image/svg+xml;utf8,${encodedSvg}) \`${colorValue}\`\n\n`,
       );
     }
+
+    // top level token info
+    // Display token info as a JSON code snippet for hierarchical support
+    const tokenJson = JSON.stringify(tokenInfo, null, 2);
+    markdown.appendCodeblock(tokenJson, "json");
+
+  
 
     // nested token info ======================================================================
     const fakeChildToken = {
