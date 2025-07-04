@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { TokenInspector } from "./TokenInspector";
-import { TokenParser } from "./TokenParser";
+import { TokenInspector } from "../token-manager/TokenInspector";
+import { TokenParser } from "../token-manager/TokenParser";
 import { HoverContentFactory } from "./HoverContentFactory";
-import { TokenDataLoader } from "../loaders/TokenDataLoader";
+import { TokenDataLoader } from "../token-manager/TokenDataLoader";
+import { TokenContext } from "../token-manager/TokenContext";
 
 interface DesignToken {
   [key: string]: any;
@@ -25,20 +26,15 @@ export interface TokenData {
 export class DesignTokenHoverProvider implements vscode.HoverProvider {
   private tokenData: TokenData = {};
   private tokenMap: Map<string, any> = new Map();
-  private semanticTokenData: any = {};
-  private semanticTokenMap: Map<string, any> = new Map();
 
   private hoverContentFactory: null | HoverContentFactory = null;
   private tokenInspector: TokenInspector | null = null;
-  private tokenDataLoader: null | TokenDataLoader = null;
+  private tokenContext: TokenContext | null = null;
 
-  constructor() {
+  constructor(tokenContext: TokenContext) {
     console.log("🔄 Initializing DesignTokenHoverProvider...");
 
-    this.tokenDataLoader = new TokenDataLoader(this);
-    this.tokenDataLoader.load(); // read and merge into a big token json file
-    console.log("🔄 Token Json file merged...");
-
+    this.tokenContext = tokenContext;
     // TOOD: populate value for tokenData and tokenMap from merged file
 
     // // TODO: build tokenMap
@@ -68,58 +64,6 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
     console.log("🔄 Starting to load design tokens...");
 
     try {
-      // const config = vscode.workspace.getConfiguration("designToken");
-      // const tokenFilePath = config.get<string>("filePath");
-
-      // console.log("📋 Configuration:", {
-      //   configuredPath: tokenFilePath,
-      //   workspaceFolders: vscode.workspace.workspaceFolders?.map(
-      //     (f) => f.uri.fsPath,
-      //   ),
-      // });
-
-      // if (!tokenFilePath) {
-      //   console.log("⚠️ No token file path configured in settings");
-      //   vscode.window.showWarningMessage(
-      //     'No design token file path configured. Please set "designToken.filePath" in settings.',
-      //   );
-      //   return;
-      // }
-
-      // // support both absolute and relative paths
-      // let fullPath = tokenFilePath;
-      // if (!path.isAbsolute(tokenFilePath)) {
-      //   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-      //   if (workspaceFolder) {
-      //     fullPath = path.join(workspaceFolder.uri.fsPath, tokenFilePath);
-      //   } else {
-      //     console.error("❌ No workspace folder found for relative path");
-      //     vscode.window.showErrorMessage(
-      //       "No workspace folder found. Cannot resolve relative token file path.",
-      //     );
-      //     return;
-      //   }
-      // }
-
-      // console.log("📁 Resolved token file path:", fullPath);
-
-      // // read the file content =========================================
-      // if (fs.existsSync(fullPath)) {
-      //   console.log("✅ Token file found, reading content...");
-      //   const fileContent = fs.readFileSync(fullPath, "utf8");
-
-      //   console.log("📄 File size:", fileContent.length, "characters");
-      //   console.log(
-      //     "📄 File preview (first 200 chars):",
-      //     fileContent.substring(0, 200) + "...",
-      //   );
-
-      //   this.tokenData = JSON.parse(fileContent);
-      //   console.log(
-      //     "🎯 Raw token data structure:",
-      //     Object.keys(this.tokenData),
-      //   );
-
       //! core logic: build the token map to facilitate quick lookup when hovering
       new TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
       this.tokenInspector?.outputTokenLoadingResults();
@@ -127,10 +71,6 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
       vscode.window.showInformationMessage(
         `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
       );
-      // } else {
-      //   console.error("❌ Token file not found:", fullPath);
-      //   vscode.window.showErrorMessage(`Token file not found: ${fullPath}`);
-      // }
     } catch (error) {
       console.error("💥 Error loading token data:", error);
       if (error instanceof SyntaxError) {
@@ -200,12 +140,5 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   }
   public getTokenMap(): Map<string, any> {
     return this.tokenMap;
-  }
-
-  public getSemanticTokenData(): any {
-    return this.semanticTokenData;
-  }
-  public getSemanticTokenMap(): Map<string, any> {
-    return this.semanticTokenMap;
   }
 }

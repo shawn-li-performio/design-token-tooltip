@@ -1,17 +1,17 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { DesignTokenHoverProvider } from "../hover-providers/DesignTokenHoverProvider";
-import { Loader } from "./Loader";
+import { Loader } from "../loaders/Loader";
+import { TokenContext } from "./TokenContext";
 
 export class TokenDataLoader implements Loader {
-  private designTokenHoverProvider: DesignTokenHoverProvider;
+  private tokenContext: TokenContext;
   private config = vscode.workspace.getConfiguration("designToken");
   private tokenFilePath = this.config.get<string>("filePath");
   private mergedTokenJsonFilePath = "merged-design-tokens.json" as const; // default path for merged tokens
 
-  constructor(designTokenHoverProvider: DesignTokenHoverProvider) {
-    this.designTokenHoverProvider = designTokenHoverProvider;
+  constructor(tokenContext: TokenContext) {
+    this.tokenContext = tokenContext;
   }
 
   async load() {

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { TokenParser } from "./TokenParser";
+import { TokenParser } from "../token-manager/TokenParser";
 import { DesignTokenHoverProvider } from "./DesignTokenHoverProvider";
 
 /**

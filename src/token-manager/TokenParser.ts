@@ -1,4 +1,4 @@
-import { TokenData } from "./DesignTokenHoverProvider";
+import { TokenData } from "../hover-providers/DesignTokenHoverProvider";
 
 /**
  * TokenParser: A utility class to parse and flatten design tokens, also includes some token related utilities.
@@ -32,7 +32,7 @@ export class TokenParser {
    */
   public static findRelatedTokens(
     tokenName: string,
-    tokenMap: Map<string, any>,
+    tokenMap: Map<string, any>
   ): Array<{ name: string; value: any }> {
     const related: Array<{ name: string; value: any }> = [];
     const baseTokenName = tokenName.replace(/^(--|\$)/, "").replace(/-/g, ".");
@@ -73,11 +73,11 @@ export class TokenParser {
             console.log(
               `  ✓ Added token: ${fullKey} = ${value.value} (${
                 value.type || "no-type"
-              })`,
+              })`
             );
           } else {
             console.log(
-              `  ✓ Added token: ${fullKey} = ${value.value} (${"no-type"})`,
+              `  ✓ Added token: ${fullKey} = ${value.value} (${"no-type"})`
             );
           }
         } else {

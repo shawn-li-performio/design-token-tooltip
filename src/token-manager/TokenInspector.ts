@@ -1,7 +1,7 @@
 import {
   DesignTokenHoverProvider,
   TokenData,
-} from "./DesignTokenHoverProvider";
+} from "../hover-providers/DesignTokenHoverProvider";
 
 /**
  * get detailed information about loaded design tokens

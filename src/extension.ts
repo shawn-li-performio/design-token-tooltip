@@ -3,16 +3,22 @@ import * as vscode from "vscode";
 import { DesignTokenHoverProvider } from "./hover-providers/DesignTokenHoverProvider";
 import { CommandLoader } from "./loaders/CommandLoader";
 import { HoverProviderLoader } from "./loaders/HoverProviderLoader";
+import { TokenContext } from "./token-manager/TokenContext";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("🎨 Design Token Tooltip extension is now active!");
   vscode.window.showInformationMessage(
-    "Design Token Tooltip extension activated!",
+    "Design Token Tooltip extension activated!"
   );
 
   // need to have a TokenContextProvider at the top level, then hoverProvider, autocompleteProvider, etc. can use it
-  const hoverProvider = new DesignTokenHoverProvider();
-  new HoverProviderLoader(context, hoverProvider).load();
+
+  const tokenContext = new TokenContext(); // read and build token context
+  console.log("🔄 Token context initialized...");
+
+  const hoverProvider = new DesignTokenHoverProvider(tokenContext); // wire up the hover provider with the token context
+
+  new HoverProviderLoader(context, hoverProvider).load(); // load into vscode
   new CommandLoader(context, hoverProvider).load();
 }
 
