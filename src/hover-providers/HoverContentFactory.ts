@@ -2,10 +2,13 @@ import * as vscode from "vscode";
 import { TokenParser } from "./TokenParser";
 import { DesignTokenHoverProvider } from "./DesignTokenHoverProvider";
 
+/**
+ * used to create hover content
+ */
 export class HoverContentFactory {
   constructor(
     private designTokenHoverProvider: DesignTokenHoverProvider,
-    private shouldDisplayUsageExamples = false,
+    private shouldDisplayUsageExamples = false
   ) {
     this.designTokenHoverProvider = designTokenHoverProvider;
   }
@@ -23,7 +26,7 @@ export class HoverContentFactory {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" rx="3" fill="${colorValue}" stroke="#ccc" /></svg>`;
       const encodedSvg = encodeURIComponent(svg);
       markdown.appendMarkdown(
-        `**Color Preview:** ![color](data:image/svg+xml;utf8,${encodedSvg}) \`${colorValue}\`\n\n`,
+        `**Color Preview:** ![color](data:image/svg+xml;utf8,${encodedSvg}) \`${colorValue}\`\n\n`
       );
     }
 
@@ -31,8 +34,6 @@ export class HoverContentFactory {
     // Display token info as a JSON code snippet for hierarchical support
     const tokenJson = JSON.stringify(tokenInfo, null, 2);
     markdown.appendCodeblock(tokenJson, "json");
-
-  
 
     // nested token info ======================================================================
     const fakeChildToken = {
@@ -44,18 +45,15 @@ export class HoverContentFactory {
     markdown.appendMarkdown(`> **\`${fakeChildToken.name}\`:**\n`);
     markdown.appendMarkdown(`> \`\`\`json\n`);
     markdown.appendMarkdown(
-      `> ${JSON.stringify(fakeChildToken, null, 2).replace(/\n/g, "\n> ")}\n`,
+      `> ${JSON.stringify(fakeChildToken, null, 2).replace(/\n/g, "\n> ")}\n`
     );
     markdown.appendMarkdown(`> \`\`\`\n\n`);
     // nested token info =====================================================================
 
-
-
-
     //! related child tokens
     const relatedTokens = TokenParser.findRelatedTokens(
       tokenName,
-      this.designTokenHoverProvider.getTokenMap(),
+      this.designTokenHoverProvider.getTokenMap()
     );
     if (relatedTokens.length > 0) {
       markdown.appendMarkdown(`**Related Tokens:**\n`);
@@ -80,7 +78,7 @@ export class HoverContentFactory {
 
   generateUsageExamples(
     tokenName: string,
-    tokenInfo: any,
+    tokenInfo: any
   ): Array<{ code: string; language: string }> {
     const examples: Array<{ code: string; language: string }> = [];
     const cssVarName = `--${tokenName

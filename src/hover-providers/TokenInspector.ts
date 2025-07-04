@@ -3,6 +3,10 @@ import {
   TokenData,
 } from "./DesignTokenHoverProvider";
 
+/**
+ * get detailed information about loaded design tokens
+ * - for debugging and inspection purposes
+ */
 export class TokenInspector {
   constructor(private designTokenHoverProvider: DesignTokenHoverProvider) {
     this.designTokenHoverProvider = designTokenHoverProvider;
@@ -64,8 +68,8 @@ export class TokenInspector {
       console.log(
         `  ${(index + 1).toString().padStart(3, " ")}. ${token.padEnd(
           30,
-          " ",
-        )} → ${valueStr}`,
+          " "
+        )} → ${valueStr}`
       );
     });
 

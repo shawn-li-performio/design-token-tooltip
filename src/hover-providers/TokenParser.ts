@@ -7,6 +7,9 @@ export class TokenParser {
   /**
    *! core logic of design token hover provider:
    *! build token map from token data to facilitate quick lookups when hovering
+   *!FIXME: not yet support chunk loading of token data
+   * - this is a simple implementation that flattens the token data structure
+
    * @param tokenData - The token data object containing design tokens
    * @param tokenMap - The map to store flattened tokens
    */
