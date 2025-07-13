@@ -53,8 +53,19 @@ export class TokenParser {
     return related.slice(0, 5); // limit to 5 related tokens for display
   }
 
+  //! tokenParser: make sure the key is unique
+  // the raw tokenData is hierarchical, but tokeMap needs to be flat for quick lookup (autocomplete might also make use of it)
+  // given a token name, token map should returns info:
+  // - the file path it comes from in style dictionary --> useful for resolving conflicts
+  // - the resultant value
+  // - the type of the token --> we may need it to determine how to preview the token
+  // - the reference tree of the token
+  // - the description of the token
+  // - other metadata if needed
+  public parseTokenDataToMap() {}
+
   /**
-   * recursively flatten token data
+   *! recursively flatten token data
    */
   private flattenTokens(obj: any, prefix: string, tokenMap: Map<string, any>) {
     for (const [key, value] of Object.entries(obj)) {

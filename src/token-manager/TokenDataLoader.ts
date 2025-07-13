@@ -6,8 +6,7 @@ import { TokenContext } from "./TokenContext";
 
 export class TokenDataLoader implements Loader {
   private tokenContext: TokenContext;
-  private config = vscode.workspace.getConfiguration("designToken");
-  private tokenFilePath = this.config.get<string>("filePath");
+  private tokenFilePath = "./style-dictionary";
   private mergedTokenJsonFilePath = "merged-design-tokens.json" as const; // default path for merged tokens
 
   constructor(tokenContext: TokenContext) {
@@ -95,7 +94,7 @@ export class TokenDataLoader implements Loader {
       for (const filePath of jsonFiles) {
         const currentRawJsonData = this.loadJsonFile({
           filePath,
-          topKeyWithFileName: true,
+          appendFilePath: true,
         });
         // Write the raw JSON data into the merged token JSON file
 
@@ -160,10 +159,10 @@ export class TokenDataLoader implements Loader {
    */
   loadJsonFile({
     filePath,
-    topKeyWithFileName = false,
+    appendFilePath = false,
   }: {
     filePath: string;
-    topKeyWithFileName?: boolean; // if true, the top level key will be
+    appendFilePath?: boolean; // if true, the file path will be appended to each top level object in the json file
   }): Record<string, any> | null {
     console.log("🔄 Starting to load design tokens...");
 
@@ -215,13 +214,15 @@ export class TokenDataLoader implements Loader {
 
         const newTokenData = JSON.parse(fileContent); //! get the raw json
 
-        if (topKeyWithFileName) {
-          const fileName = path.basename(fullPath, ".json");
+        if (appendFilePath) {
           if (newTokenData && typeof newTokenData === "object") {
             for (const key of Object.keys(newTokenData)) {
-              const value = newTokenData[key];
-              delete newTokenData[key];
-              newTokenData[`${key}_${fileName}`] = value;
+              if (newTokenData[key] && typeof newTokenData[key] === "object") {
+                newTokenData[key] = {
+                  filePath: fullPath.replace(/.*\/style-dictionary\//, ""),
+                  ...newTokenData[key],
+                };
+              }
             }
           }
         }

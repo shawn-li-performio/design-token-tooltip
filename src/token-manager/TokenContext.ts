@@ -13,6 +13,14 @@ interface TokenData {
   [key: string]: DesignToken | TokenData;
 }
 
+/**
+ * main class for managing design tokens - backend of the extension
+ * - load token data from file
+ * - parse token data into a flat map for quick lookup
+ * - provide methods to query token data
+ * - provide methods to inspect token data
+ * 
+ */
 export class TokenContext {
   private tokenData: TokenData = {};
   private tokenMap: Map<string, any> = new Map();
@@ -37,8 +45,7 @@ export class TokenContext {
     );
   }
 
-  //! tokenParser: make sure the key is unique
-
+  
   // token query methods -> allowing lookup token reference tree
   // isReferenceToken
   // isPrimitiveToken
