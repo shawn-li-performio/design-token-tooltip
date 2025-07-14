@@ -13,7 +13,10 @@ export class HoverContentFactory {
     this.designTokenHoverProvider = designTokenHoverProvider;
   }
 
-  createHoverContent(tokenName: string, tokenInfo: any): vscode.MarkdownString {
+  createHoverContent(
+    tokenName: string,
+    tokenInfo: { value: string; type: string }
+  ): vscode.MarkdownString {
     const markdown = new vscode.MarkdownString(undefined, true);
     markdown.isTrusted = true;
 
@@ -35,21 +38,20 @@ export class HoverContentFactory {
     const tokenJson = JSON.stringify(tokenInfo, null, 2);
     markdown.appendCodeblock(tokenJson, "json");
 
-    // nested token info ======================================================================
-    const fakeChildToken = {
-      name: tokenName,
-      value: tokenInfo.value,
-      type: tokenInfo.type,
-      description: tokenInfo.description,
-    };
-    markdown.appendMarkdown(`> **\`${fakeChildToken.name}\`:**\n`);
-    markdown.appendMarkdown(`> \`\`\`json\n`);
-    markdown.appendMarkdown(
-      `> ${JSON.stringify(fakeChildToken, null, 2).replace(/\n/g, "\n> ")}\n`
-    );
-    markdown.appendMarkdown(`> \`\`\`\n\n`);
-    // nested token info =====================================================================
-
+    // // nested token info ======================================================================
+    // const fakeChildToken = {
+    //   name: tokenName,
+    //   value: tokenInfo.value,
+    //   type: tokenInfo.type,
+    //   // description: tokenInfo.description,
+    // };
+    // markdown.appendMarkdown(`> **\`${fakeChildToken.name}\`:**\n`);
+    // markdown.appendMarkdown(`> \`\`\`json\n`);
+    // markdown.appendMarkdown(
+    //   `> ${JSON.stringify(fakeChildToken, null, 2).replace(/\n/g, "\n> ")}\n`
+    // );
+    // markdown.appendMarkdown(`> \`\`\`\n\n`);
+    // // nested token info =====================================================================
 
     if (this.shouldDisplayUsageExamples) {
       const examples = this.generateUsageExamples(tokenName, tokenInfo);

@@ -42,8 +42,8 @@ export class CommandLoader implements Loader {
     const inspectCommand = vscode.commands.registerCommand(
       "designToken.inspect",
       () => {
-        const tokenData = this.hoverProvider.getTokenData();
-        const tokenMap = this.hoverProvider.getTokenMap();
+        const tokenData = this.hoverProvider.getTokenContext().getTokenData();
+        const tokenMap = this.hoverProvider.getTokenContext().getTokenMap();
         console.log("🔍 Inspecting Design Token Data");
         console.log("📋 Token Data Structure:", Object.keys(tokenData));
         console.log("Token Data Sample:", tokenData);

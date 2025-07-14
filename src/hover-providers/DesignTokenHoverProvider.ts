@@ -23,9 +23,6 @@ export interface TokenData {
  * provide hover information based on the token map - hoverRenderer, markdownFactory
  */
 export class DesignTokenHoverProvider implements vscode.HoverProvider {
-  private tokenData: TokenData = {};
-  private tokenMap: Map<string, any> = new Map();
-
   private hoverContentFactory: null | HoverContentFactory = null;
   private tokenContext: TokenContext | null = null;
 
@@ -33,19 +30,8 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
     console.log("🔄 Initializing DesignTokenHoverProvider...");
 
     this.tokenContext = tokenContext;
-    // TOOD: populate value for tokenData and tokenMap from merged file
 
-    // // TODO: build tokenMap
-    // //! core logic: build the token map to facilitate quick lookup when hovering
-    // new TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
-    // this.tokenInspector?.outputTokenLoadingResults();
-
-    // vscode.window.showInformationMessage(
-    //   `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`,
-    // );
-
-    // this.hoverContentFactory = new HoverContentFactory(this);
-    // this.tokenInspector = new TokenInspector(this);
+    this.hoverContentFactory = new HoverContentFactory(this);
 
     // // watch for configuration changes
     // vscode.workspace.onDidChangeConfiguration((e) => {
@@ -54,34 +40,6 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
     //   }
     // });
   }
-
-  /**
-   * load Design Token data
-   */
-  // loadTokenData() {
-  //   console.log("🔄 Starting to load design tokens...");
-
-  //   try {
-  //     //! core logic: build the token map to facilitate quick lookup when hovering
-  //     new TokenParser().buildTokenMap(this.tokenNa, this.tokenMap);
-  //     this.tokenInspector?.outputTokenLoadingResults();
-
-  //     vscode.window.showInformationMessage(
-  //       `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
-  //     );
-  //   } catch (error) {
-  //     console.error("💥 Error loading token data:", error);
-  //     if (error instanceof SyntaxError) {
-  //       vscode.window.showErrorMessage(
-  //         `Invalid JSON in token file: ${error.message}`
-  //       );
-  //     } else {
-  //       vscode.window.showErrorMessage(
-  //         "Failed to load design tokens: " + error
-  //       );
-  //     }
-  //   }
-  // }
 
   /**
    * ! Provide hover information for design tokens
@@ -118,7 +76,7 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
     ];
 
     for (const tokenName of possibleTokens) {
-      const tokenInfo = this.tokenMap.get(tokenName);
+      const tokenInfo = this.tokenContext?.getTokenMap().get(tokenName);
       console.log("hovering - ", `🔎 Checking token: ${tokenName}`, tokenInfo);
       if (tokenInfo) {
         const hoverContent = this.hoverContentFactory.createHoverContent(
@@ -133,10 +91,10 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
     return null;
   }
 
-  public getTokenData(): TokenData {
-    return this.tokenData;
-  }
-  public getTokenMap(): Map<string, any> {
-    return this.tokenMap;
+  public getTokenContext(): TokenContext {
+    if (this.tokenContext === null) {
+      throw new Error("TokenContext is not initialized");
+    }
+    return this.tokenContext;
   }
 }
