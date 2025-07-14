@@ -4,9 +4,15 @@ import * as path from "path";
 import { Loader } from "../loaders/Loader";
 import { TokenContext } from "./TokenContext";
 
+/**
+ * TokenDataLoader: An IO utility class to load design token data from a JSON file.
+ * - Loads token data from a specified file path
+ * - Exports the flat token map to a JSON file for quick access
+ */
 export class TokenDataLoader implements Loader {
   private tokenContext: TokenContext;
-  private tokenFilePath = "./style-dictionary/electric-raw-tokens.json";
+  private TOKEN_FILE_PATH = "./style-dictionary/electric-raw-tokens.json";
+  private FLAT_TOKEN_MAP_EXPORT_PATH = "./style-dictionary/flat-token-map.json";
 
   constructor(tokenContext: TokenContext) {
     this.tokenContext = tokenContext;
@@ -14,7 +20,7 @@ export class TokenDataLoader implements Loader {
 
   async load() {
     // resolve the all the files under the nominated directory,
-    if (!this.tokenFilePath) {
+    if (!this.TOKEN_FILE_PATH) {
       vscode.window.showWarningMessage(
         'No design token file path configured. Please set "designToken.filePath" in settings.'
       );
@@ -22,7 +28,7 @@ export class TokenDataLoader implements Loader {
     }
 
     // make sure the dirPath is absolute
-    let dirPath = this.tokenFilePath;
+    let dirPath = this.TOKEN_FILE_PATH;
     if (!path.isAbsolute(dirPath)) {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       if (workspaceFolder) {
@@ -40,7 +46,7 @@ export class TokenDataLoader implements Loader {
     });
     if (!electricRawTokenJsonData) {
       vscode.window.showErrorMessage(
-        `Failed to load design tokens from ${this.tokenFilePath}`
+        `Failed to load design tokens from ${this.TOKEN_FILE_PATH}`
       );
       return;
     }
@@ -127,7 +133,7 @@ export class TokenDataLoader implements Loader {
     const tokenMapJson = JSON.stringify(Object.fromEntries(tokenMap), null, 2);
     const exportPath = path.join(
       vscode.workspace.workspaceFolders?.[0].uri.fsPath || "",
-      "exported-token-map.json"
+      this.FLAT_TOKEN_MAP_EXPORT_PATH
     );
     fs.writeFileSync(exportPath, tokenMapJson, "utf8");
     vscode.window.showInformationMessage(`Token map exported to ${exportPath}`);

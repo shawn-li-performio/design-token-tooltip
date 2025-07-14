@@ -34,47 +34,27 @@ export class TokenParser {
    * !Recursively searches for a token value in the nested TokenData structure
    * @param tokenData - The nested token data structure
    * @param path - Array of path segments to traverse
-   * @param tokenType - The type of the token (used for speedup map building and reduce conflicts when resolving the path)
    * @returns The string value if found, null otherwise
    */
-  private findTokenValue(
-    tokenData: TokenData,
-    path: string[],
-    tokenType: string
-  ): string | null {
-    let current: any = tokenData;
-
-    // semantic token resolving
-    if (tokenType.toLowerCase().includes("semantic") && tokenData.semanticTokens) {
-      let semanticCurrent: any = tokenData.semanticTokens;
-      for (const segment of path) {
-        if (semanticCurrent && typeof semanticCurrent === "object" && segment in semanticCurrent) {
-          semanticCurrent = semanticCurrent[segment];  // traverse down to the next node
-        } else {
-          semanticCurrent = null;
-          break;
-        }
-      }
-      if (typeof semanticCurrent === "string") {
-        return semanticCurrent;
+  private findTokenValue({
+    flatTokenData,
+    tokenName,
+  }: {
+    flatTokenData: Map<string, string>;
+    tokenName: string;
+  }): string | null {
+    for (const [fullPath, value] of flatTokenData.entries()) {
+      if (fullPath.endsWith(`.${tokenName}`) || fullPath === tokenName) {
+        return value;
       }
     }
-
-    // other token resolving
-    for (const segment of path) {
-      if (current && typeof current === "object" && segment in current) {
-        current = current[segment];
-      } else {
-        return null;
-      }
-    }
-
-    // The final value should be a string
-    return typeof current === "string" ? current : null;
+    return null;
   }
 
   /**
-   * Creates a flat token map from TokenNames and TokenData
+   * Creates a flat token map for easy lookup
+   * This method flattens the nested token data structure into a Map with full paths as keys
+   * and their corresponding values as values.
    * @param tokenNames - Structure defining token types and their associated token names
    * @param tokenData - Nested structure containing actual token values
    * @returns A Map with token names as keys and {value, type} as values
@@ -85,16 +65,41 @@ export class TokenParser {
   ): FlatTokenMap {
     const flatMap = new Map<string, TokenMapValue>();
 
-    let notFoundTokenCount = 0;
-    // Iterate through all token types
-    for (const [tokenType, names] of Object.entries(tokenNames)) {
-      // For each token name in the current type
-      for (const tokenName of names) {
-        // Split the token name into path segments (e.g., "data-grid.typography.ag-font-family" -> ["data-grid", "typography", "ag-font-family"])
-        const pathSegments = tokenName.split(".");
+    /**
+     * Flattens a nested TokenData structure into a Map of full paths to values
+     * @param obj - The object to flatten
+     * @param parentPath - Current path being built
+     * @param result - The map to store results in
+     */
+    function flattenTokenData(
+      obj: any,
+      parentPath: string = "",
+      result: Map<string, string> = new Map()
+    ): Map<string, string> {
+      if (!obj || typeof obj !== "object") {
+        return result;
+      }
 
+      for (const [key, value] of Object.entries(obj)) {
+        const currentPath = parentPath ? `${parentPath}.${key}` : key;
+
+        if (typeof value === "string") {
+          // Found a token value at leaf node
+          result.set(currentPath, value);
+        } else if (typeof value === "object" && value !== null) {
+          // Recursively flatten nested objects
+          flattenTokenData(value, currentPath, result);
+        }
+      }
+      return result;
+    }
+    const flatTokenData = flattenTokenData(tokenData);
+
+    let notFoundTokens = [];
+    for (const [tokenType, names] of Object.entries(tokenNames)) {
+      for (const tokenName of names) {
         //! Find the value in the nested token data
-        const value = this.findTokenValue(tokenData, pathSegments, tokenType);
+        const value = this.findTokenValue({ flatTokenData, tokenName });
 
         if (value !== null) {
           flatMap.set(tokenName, {
@@ -103,15 +108,24 @@ export class TokenParser {
           });
         } else {
           // Handle missing tokens - you might want to log this or throw an error
-          console.warn(
-            `Token "${tokenName}" of type "${tokenType}" not found in token data`
-          );
-          notFoundTokenCount++;
+          notFoundTokens.push(tokenName);
         }
       }
     }
 
-    console.warn("" + notFoundTokenCount + " tokens not found in token data");
+    console.warn(
+      "" +
+        notFoundTokens.length +
+        " tokens not found in token data" +
+        "Details:\n",
+      notFoundTokens
+    );
+    console.log(
+      `✅ Token map created with ${flatMap.size} entries from ${
+        Object.keys(tokenNames).length
+      } token types.`
+    );
+    console.log();
 
     return flatMap;
   }

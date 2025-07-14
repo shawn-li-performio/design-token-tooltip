@@ -19,7 +19,7 @@ export class CommandLoader implements Loader {
       "designToken.reload",
       () => {
         console.log("\n🔄 ===== MANUAL RELOAD TRIGGERED =====");
-        this.hoverProvider.loadTokenData();
+        // this.hoverProvider.loadTokenData();  // TODO: check the logic that wires hover provider with token contetx
         console.log("🔄 ===== MANUAL RELOAD COMPLETED =====\n");
         vscode.window.showInformationMessage(
           "✅ Design Token reload completed!"

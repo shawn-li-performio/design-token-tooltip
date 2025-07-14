@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import * as fs from "fs";
 import * as path from "path";
-import { TokenInspector } from "../token-manager/TokenInspector";
 import { TokenParser } from "../token-manager/TokenParser";
 import { HoverContentFactory } from "./HoverContentFactory";
 import { TokenDataLoader } from "../token-manager/TokenDataLoader";
@@ -28,7 +27,6 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   private tokenMap: Map<string, any> = new Map();
 
   private hoverContentFactory: null | HoverContentFactory = null;
-  private tokenInspector: TokenInspector | null = null;
   private tokenContext: TokenContext | null = null;
 
   constructor(tokenContext: TokenContext) {

@@ -50,18 +50,6 @@ export class HoverContentFactory {
     markdown.appendMarkdown(`> \`\`\`\n\n`);
     // nested token info =====================================================================
 
-    //! related child tokens
-    const relatedTokens = TokenParser.findRelatedTokens(
-      tokenName,
-      this.designTokenHoverProvider.getTokenMap()
-    );
-    if (relatedTokens.length > 0) {
-      markdown.appendMarkdown(`**Related Tokens:**\n`);
-      relatedTokens.forEach((related) => {
-        markdown.appendMarkdown(`- \`${related.name}\`: ${related.value}\n`);
-      });
-      markdown.appendMarkdown(`\n`);
-    }
 
     if (this.shouldDisplayUsageExamples) {
       const examples = this.generateUsageExamples(tokenName, tokenInfo);

@@ -34,11 +34,11 @@ export type FlatTokenMap = Map<AllTokenNames<TokenNames>, TokenMapValue>;
 export class TokenContext {
   private tokenNames: TokenNames = {};
   private tokenData: TokenData = {};
-  private tokenMap: FlatTokenMap = new Map();
+  private flatTokenMap: FlatTokenMap = new Map(); // core data structure for quick token lookup in hover provider
 
   private tokenDataLoader: null | TokenDataLoader = null;
-  // token parser - parse tokanData into tokenMap
-  // token query (including current token inspector) - mainly for extracting information from tokenMap
+  // token parser - parse tokanData into flatTokenMap
+  // token query (including current token inspector) - mainly for extracting information from flatTokenMap
   // a dedicated HoverContentFactory that uses token query to build hover content
 
   constructor() {
@@ -48,16 +48,16 @@ export class TokenContext {
     console.log("✅ Token names loaded:", Object.keys(this.tokenNames));
     console.log("✅ Token data loaded:", Object.keys(this.tokenData));
 
-    //! step2: build tokenMap from the big merged token json file
+    //! step2: build flatTokenMap from the big merged token json file
     const flatTokenMap = new TokenParser().buildTokenMap(
       this.tokenNames,
       this.tokenData
     );
-    this.tokenMap = flatTokenMap;
+    this.flatTokenMap = flatTokenMap;
 
-
+    this.tokenDataLoader.exportTokenMap(); // export the token map to a json file for quick lookup
     vscode.window.showInformationMessage(
-      `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
+      `✅ Design tokens loaded! Found ${this.flatTokenMap.size} tokens.`
     );
   }
 
@@ -65,9 +65,6 @@ export class TokenContext {
   // isReferenceToken
   // isPrimitiveToken
   // getTokenReference tree
-
-
-
 
   public getTokenNames(): TokenNames {
     return this.tokenNames;
@@ -84,9 +81,9 @@ export class TokenContext {
   }
 
   public getTokenMap(): Map<string, any> {
-    return this.tokenMap;
+    return this.flatTokenMap;
   }
-  public setTokenMap(tokenMap: Map<string, any>): void {
-    this.tokenMap = tokenMap;
+  public setTokenMap(flatTokenMap: Map<string, any>): void {
+    this.flatTokenMap = flatTokenMap;
   }
 }
