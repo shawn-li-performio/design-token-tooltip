@@ -13,8 +13,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   // need to have a TokenContextProvider at the top level, then hoverProvider, autocompleteProvider, etc. can use it
 
-  const tokenContext = new TokenContext(); // read and build token context
-  console.log("🔄 Token context initialized...");
+  const tokenContext = new TokenContext(); //! read and build token context
+  console.log("✅ Token context initialized...");
 
   const hoverProvider = new DesignTokenHoverProvider(tokenContext); // wire up the hover provider with the token context
 

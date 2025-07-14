@@ -5,12 +5,12 @@ import { Loader } from "./Loader";
 export class CommandLoader implements Loader {
   constructor(
     private context: vscode.ExtensionContext,
-    private hoverProvider: DesignTokenHoverProvider,
+    private hoverProvider: DesignTokenHoverProvider
   ) {
     this.context = context;
     this.hoverProvider = hoverProvider;
 
-    console.log("🎨 Design Token Tooltip Command Loader initialized!");
+    console.log("✅ Design Token Tooltip Command Loader initialized!");
   }
 
   public load() {
@@ -22,9 +22,9 @@ export class CommandLoader implements Loader {
         this.hoverProvider.loadTokenData();
         console.log("🔄 ===== MANUAL RELOAD COMPLETED =====\n");
         vscode.window.showInformationMessage(
-          "✅ Design Token reload completed!",
+          "✅ Design Token reload completed!"
         );
-      },
+      }
     );
     this.context.subscriptions.push(reloadCommand);
 
@@ -33,9 +33,9 @@ export class CommandLoader implements Loader {
       "designToken.test",
       () => {
         vscode.window.showInformationMessage(
-          "✅ Design Token extension is working!",
+          "✅ Design Token extension is working!"
         );
-      },
+      }
     );
     this.context.subscriptions.push(testCommand);
 
@@ -52,13 +52,13 @@ export class CommandLoader implements Loader {
         console.log("📂 Token Map Sample:", Array.from(tokenMap.entries()));
         console.log(
           "🔍 Token Map Keys:",
-          Array.from(tokenMap.keys()).slice(0, 10),
+          Array.from(tokenMap.keys()).slice(0, 10)
         );
 
         vscode.window.showInformationMessage(
-          "🔍 Check the console for token data inspection results!",
+          "🔍 Check the console for token data inspection results!"
         );
-      },
+      }
     );
     this.context.subscriptions.push(inspectCommand);
   }

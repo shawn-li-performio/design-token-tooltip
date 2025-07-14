@@ -6,8 +6,7 @@ import { TokenContext } from "./TokenContext";
 
 export class TokenDataLoader implements Loader {
   private tokenContext: TokenContext;
-  private tokenFilePath = "./style-dictionary";
-  private mergedTokenJsonFilePath = "merged-design-tokens.json" as const; // default path for merged tokens
+  private tokenFilePath = "./style-dictionary/electric-raw-tokens.json";
 
   constructor(tokenContext: TokenContext) {
     this.tokenContext = tokenContext;
@@ -22,6 +21,7 @@ export class TokenDataLoader implements Loader {
       return;
     }
 
+    // make sure the dirPath is absolute
     let dirPath = this.tokenFilePath;
     if (!path.isAbsolute(dirPath)) {
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
@@ -35,120 +35,35 @@ export class TokenDataLoader implements Loader {
       }
     }
 
-    const jsonFilePathList = this.findJsonFiles(dirPath);
-    console.log("Found JSON files:", jsonFilePathList);
-
-    await this.mergeJsonFiles(jsonFilePathList);
+    const electricRawTokenJsonData = this.loadJsonFile({
+      filePath: dirPath,
+    });
+    if (!electricRawTokenJsonData) {
+      vscode.window.showErrorMessage(
+        `Failed to load design tokens from ${this.tokenFilePath}`
+      );
+      return;
+    }
     console.log(
-      `✅ Merged design tokens written to ${this.mergedTokenJsonFilePath}`
+      "✅ Loaded electric raw token JSON data:",
+      Object.keys(electricRawTokenJsonData)
     );
 
-    //! crucial step - load the merged json file data into the map --> the key should never overlap with the existing keys in the map, need to check
-  }
-
-  findJsonFiles(dir: string): string[] {
-    let results: string[] = [];
-
-    if (!fs.existsSync(dir)) return results;
-
-    const list = fs.readdirSync(dir);
-    for (const file of list) {
-      const filePath = path.join(dir, file);
-      const stat = fs.statSync(filePath);
-      if (stat && stat.isDirectory()) {
-        results = results.concat(this.findJsonFiles(filePath));
-      } else if (file.endsWith(".json")) {
-        results.push(filePath);
-      }
-    }
-    return results;
-  }
-
-  async mergeJsonFiles(jsonFiles: string[]): Promise<void> {
-    // then merge the json file one by one (the json file name might also contains information about the design token) ===================
-    console.log("🔄 Starting to load design tokens...");
-    if (jsonFiles.length === 0) {
-      vscode.window.showWarningMessage(
-        "No design token JSON files found in the configured directory."
+    if (electricRawTokenJsonData["tokenData"]) {
+      this.tokenContext.setTokenData(electricRawTokenJsonData["tokenData"]);
+    } else {
+      console.warn(
+        "⚠️ No 'tokenData' key found in the JSON. Using the entire JSON as token data."
       );
-      return;
     }
 
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (!workspaceFolder) {
-      vscode.window.showErrorMessage(
-        "No workspace folder found. Cannot write merged token file."
+    if (electricRawTokenJsonData["tokenNames"]) {
+      this.tokenContext.setTokenNames(electricRawTokenJsonData["tokenNames"]);
+    } else {
+      console.warn(
+        "⚠️ No 'tokenNames' key found in the JSON. Using an empty object for token names."
       );
-      return;
-    }
-    const mergedFileUri = vscode.Uri.joinPath(
-      workspaceFolder.uri,
-      this.mergedTokenJsonFilePath
-    );
-
-    try {
-      // fisrtly, get the json string
-      let currentJsonFileIndex = 0;
-      let resMergedTokenString = "";
-      const skippedJsonFiles: string[] = [];
-      for (const filePath of jsonFiles) {
-        const currentRawJsonData = this.loadJsonFile({
-          filePath,
-          appendFilePath: true,
-        });
-        // Write the raw JSON data into the merged token JSON file
-
-        const content = JSON.stringify(currentRawJsonData, null, 2);
-        let trimmedContent = content.trim();
-        if (trimmedContent.startsWith("{") && trimmedContent.endsWith("}")) {
-          trimmedContent = trimmedContent.slice(1, -1).trim();
-        } else {
-          vscode.window.showErrorMessage(
-            `❌ Invalid JSON format in file: ${filePath} - skipping it`
-          );
-          skippedJsonFiles.push(filePath);
-          continue;
-        }
-        if (trimmedContent.length > 0) {
-          resMergedTokenString += trimmedContent + ",\n"; // add a comma to separate the objects
-        }
-
-        currentJsonFileIndex++;
-        console.log(
-          `🔄 reading token JSON file from ${filePath}: (${currentJsonFileIndex}/${jsonFiles.length})`
-        );
-      }
-      if (resMergedTokenString.endsWith(",\n")) {
-        resMergedTokenString = resMergedTokenString.slice(0, -2);
-      }
-      resMergedTokenString = `{\n${resMergedTokenString}\n}`; // wrap the merged content in an object
-
-      //! write the merged token json into a new file
-      await vscode.workspace.fs.writeFile(
-        mergedFileUri,
-        Buffer.from(resMergedTokenString, "utf8")
-      );
-
-      // merge reporting =========================================================
-      let mergeReport = `\n🎯🎯🎯🎯🎯🎯🎯\n Merged ${currentJsonFileIndex} JSON files into ${mergedFileUri.fsPath}:\n`;
-      if (skippedJsonFiles.length > 0) {
-        mergeReport += `⚠️ Skipped ${skippedJsonFiles.length} files due to invalid JSON format:\n`;
-        skippedJsonFiles.forEach((file) => {
-          mergeReport += `  - ${file}\n`;
-        });
-      } else {
-        mergeReport += `✅ All files merged successfully.\n`;
-      }
-      mergeReport += `\n🎯🎯🎯🎯🎯🎯🎯\n`;
-      console.log(mergeReport);
-    } catch (err) {
-      console.error(
-        `❌ Failed to write to ${this.mergedTokenJsonFilePath}:`,
-        err
-      );
-      vscode.window.showErrorMessage(
-        `Failed to write to merged token file: ${err}`
-      );
+      this.tokenContext.setTokenNames({});
     }
   }
 
@@ -159,7 +74,6 @@ export class TokenDataLoader implements Loader {
    */
   loadJsonFile({
     filePath,
-    appendFilePath = false,
   }: {
     filePath: string;
     appendFilePath?: boolean; // if true, the file path will be appended to each top level object in the json file
@@ -167,39 +81,7 @@ export class TokenDataLoader implements Loader {
     console.log("🔄 Starting to load design tokens...");
 
     try {
-      const tokenFilePath = filePath;
-
-      console.log("📋 Configuration:", {
-        configuredPath: tokenFilePath,
-        workspaceFolders: vscode.workspace.workspaceFolders?.map(
-          (f) => f.uri.fsPath
-        ),
-      });
-
-      if (!tokenFilePath) {
-        console.log("⚠️ No token file path configured in settings");
-        vscode.window.showWarningMessage(
-          'No design token file path configured. Please set "designToken.filePath" in settings.'
-        );
-        return null;
-      }
-
-      // support both absolute and relative paths
-      let fullPath = tokenFilePath;
-      if (!path.isAbsolute(tokenFilePath)) {
-        const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-        if (workspaceFolder) {
-          fullPath = path.join(workspaceFolder.uri.fsPath, tokenFilePath);
-        } else {
-          console.error("❌ No workspace folder found for relative path");
-          vscode.window.showErrorMessage(
-            "No workspace folder found. Cannot resolve relative token file path."
-          );
-          return null;
-        }
-      }
-
-      console.log("📁 Resolved token file path:", fullPath); //! fullPath is absolute path
+      const fullPath = filePath;
 
       //! read the file content =========================================
       if (fs.existsSync(fullPath)) {
@@ -213,19 +95,6 @@ export class TokenDataLoader implements Loader {
         );
 
         const newTokenData = JSON.parse(fileContent); //! get the raw json
-
-        if (appendFilePath) {
-          if (newTokenData && typeof newTokenData === "object") {
-            for (const key of Object.keys(newTokenData)) {
-              if (newTokenData[key] && typeof newTokenData[key] === "object") {
-                newTokenData[key] = {
-                  filePath: fullPath.replace(/.*\/style-dictionary\//, ""),
-                  ...newTokenData[key],
-                };
-              }
-            }
-          }
-        }
 
         console.log("🎯 Raw token data structure:", Object.keys(newTokenData));
         return newTokenData;

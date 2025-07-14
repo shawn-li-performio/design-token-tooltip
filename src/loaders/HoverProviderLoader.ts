@@ -15,12 +15,12 @@ const SUPPORTED_LANGUAGES = [
 export class HoverProviderLoader implements Loader {
   constructor(
     private context: vscode.ExtensionContext,
-    private hoverProvider: DesignTokenHoverProvider,
+    private hoverProvider: DesignTokenHoverProvider
   ) {
     this.context = context;
     this.hoverProvider = hoverProvider;
 
-    console.log("🎨 Design Token Tooltip Hover Provider Loader initialized!");
+    console.log("✅ Design Token Tooltip Hover Provider Loader initialized!");
   }
 
   public load() {
@@ -28,7 +28,7 @@ export class HoverProviderLoader implements Loader {
     SUPPORTED_LANGUAGES.forEach((language) => {
       const disposable = vscode.languages.registerHoverProvider(
         language,
-        this.hoverProvider,
+        this.hoverProvider
       );
       this.context.subscriptions.push(disposable);
     });
