@@ -200,3 +200,17 @@ Developer: Reset Extension Host
 3. **Modify configuration:**
    - Configure the token file path in settings
    - Use `Ctrl+Shift+P` → "Reload Design Tokens" to reload
+
+
+## Sample token json files
+
++ raw-tokens.json
+  + Generated using token-studio and electric-transforms-studio via Style Dictionary in EDS.
+
++ electric-raw-tokens.json
+  + Derived from raw-tokens.json, generated with electric/design-token-intelliSense-raw-input via Style Dictionary in EDS.
+  + Serves as the input for the TokenParser in this repository.
+
++ flat-token-map.json
+  + The core data structure used for quick lookups.
+  + Generated from electric-raw-tokens.json by the TokenParser.
