@@ -60,30 +60,30 @@ export class DesignTokenHoverProvider implements vscode.HoverProvider {
   /**
    * load Design Token data
    */
-  loadTokenData() {
-    console.log("🔄 Starting to load design tokens...");
+  // loadTokenData() {
+  //   console.log("🔄 Starting to load design tokens...");
 
-    try {
-      //! core logic: build the token map to facilitate quick lookup when hovering
-      new TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
-      this.tokenInspector?.outputTokenLoadingResults();
+  //   try {
+  //     //! core logic: build the token map to facilitate quick lookup when hovering
+  //     new TokenParser().buildTokenMap(this.tokenNa, this.tokenMap);
+  //     this.tokenInspector?.outputTokenLoadingResults();
 
-      vscode.window.showInformationMessage(
-        `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
-      );
-    } catch (error) {
-      console.error("💥 Error loading token data:", error);
-      if (error instanceof SyntaxError) {
-        vscode.window.showErrorMessage(
-          `Invalid JSON in token file: ${error.message}`
-        );
-      } else {
-        vscode.window.showErrorMessage(
-          "Failed to load design tokens: " + error
-        );
-      }
-    }
-  }
+  //     vscode.window.showInformationMessage(
+  //       `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
+  //     );
+  //   } catch (error) {
+  //     console.error("💥 Error loading token data:", error);
+  //     if (error instanceof SyntaxError) {
+  //       vscode.window.showErrorMessage(
+  //         `Invalid JSON in token file: ${error.message}`
+  //       );
+  //     } else {
+  //       vscode.window.showErrorMessage(
+  //         "Failed to load design tokens: " + error
+  //       );
+  //     }
+  //   }
+  // }
 
   /**
    * ! Provide hover information for design tokens

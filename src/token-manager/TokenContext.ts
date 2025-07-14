@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { TokenDataLoader } from "./TokenDataLoader";
 import { TokenParser } from "./TokenParser";
 
-type TokenNames = {
+export type TokenNames = {
   [key: string]: string[];
 };
 
@@ -12,7 +12,7 @@ type DesignToken = {
   [key: string]: string | { [key: string]: DesignToken };
 };
 
-type TokenData = {
+export type TokenData = {
   [key: string]: DesignToken;
 };
 
@@ -20,6 +20,8 @@ type TokenMapValue = {
   value: string;
   type: string;
 };
+
+export type FlatTokenMap = Map<AllTokenNames<TokenNames>, TokenMapValue>;
 
 /**
  * main class for managing design tokens - backend of the extension
@@ -32,7 +34,7 @@ type TokenMapValue = {
 export class TokenContext {
   private tokenNames: TokenNames = {};
   private tokenData: TokenData = {};
-  private tokenMap: Map<AllTokenNames<TokenNames>, TokenMapValue> = new Map();
+  private tokenMap: FlatTokenMap = new Map();
 
   private tokenDataLoader: null | TokenDataLoader = null;
   // token parser - parse tokanData into tokenMap
@@ -47,9 +49,13 @@ export class TokenContext {
     console.log("✅ Token data loaded:", Object.keys(this.tokenData));
 
     //! step2: build tokenMap from the big merged token json file
-    // new TokenParser().buildTokenMap(this.tokenData, this.tokenMap);
-    // this.tokenInspector?.outputTokenLoadingResults();
+    const flatTokenMap = new TokenParser().buildTokenMap(
+      this.tokenNames,
+      this.tokenData
+    );
+    this.tokenMap = flatTokenMap;
 
+    
     vscode.window.showInformationMessage(
       `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
     );
