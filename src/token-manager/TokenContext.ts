@@ -16,7 +16,7 @@ export type TokenData = {
   [key: string]: DesignToken;
 };
 
-type TokenMapValue = {
+export type TokenMapValue = {
   value: string;
   type: string;
 };
@@ -55,7 +55,7 @@ export class TokenContext {
     );
     this.tokenMap = flatTokenMap;
 
-    
+
     vscode.window.showInformationMessage(
       `✅ Design tokens loaded! Found ${this.tokenMap.size} tokens.`
     );
@@ -65,6 +65,9 @@ export class TokenContext {
   // isReferenceToken
   // isPrimitiveToken
   // getTokenReference tree
+
+
+
 
   public getTokenNames(): TokenNames {
     return this.tokenNames;

@@ -120,4 +120,16 @@ export class TokenDataLoader implements Loader {
       }
     }
   }
+
+  public exportTokenMap() {
+    // export the token map to a json file
+    const tokenMap = this.tokenContext.getTokenMap();
+    const tokenMapJson = JSON.stringify(Object.fromEntries(tokenMap), null, 2);
+    const exportPath = path.join(
+      vscode.workspace.workspaceFolders?.[0].uri.fsPath || "",
+      "exported-token-map.json"
+    );
+    fs.writeFileSync(exportPath, tokenMapJson, "utf8");
+    vscode.window.showInformationMessage(`Token map exported to ${exportPath}`);
+  }
 }
