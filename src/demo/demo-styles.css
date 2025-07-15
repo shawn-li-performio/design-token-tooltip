@@ -1,0 +1,21 @@
+/* Demo CSS file to test inline color previews */
+/* This file demonstrates how design tokens show color swatches inline */
+
+.button {
+  /* These CSS custom properties should show color previews */
+  color: var(--brand-primary-500);
+  background-color: var(--system-background-surface-light);
+  border-color: var(--brand-primary-300);
+}
+
+.card {
+  background: var(--system-background-surface-dark);
+  color: var(--brand-primary-100);
+}
+
+.header {
+  /* Testing different variations */
+  background-color: var(--brand-primary-500);
+  color: var(--system-background-surface-light);
+}
+

@@ -28,6 +28,11 @@
           "type": "string",
           "default": "tokens.json",
           "description": "Path to the design tokens JSON file (relative to workspace root or absolute path)"
+        },
+        "designToken.inlineColorPreview": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show color preview swatches inline with design tokens (similar to Tailwind CSS IntelliSense)"
         }
       }
     },
@@ -43,6 +48,10 @@
       {
         "command": "designToken.inspect",
         "title": "Inspect Design Token Data Loaded"
+      },
+      {
+        "command": "designToken.toggleInlinePreview",
+        "title": "Toggle Inline Color Preview"
       }
     ]
   },

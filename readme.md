@@ -1,3 +1,88 @@
+# Design Token Tooltip
+
+A VS Code extension that provides hover tooltips and inline color previews for design tokens, similar to Tailwind CSS IntelliSense.
+
+## 🎨 Key Features
+
+### ✨ Inline Color Preview (NEW!)
+
+- **Real-time color swatches**: Color previews appear directly next to design tokens in your code
+- **Tailwind CSS IntelliSense-like experience**: Small color squares show inline with token names
+- **Multiple formats supported**: Works with string literals, CSS custom properties, SCSS variables, and object property access
+- **Smart detection**: Automatically finds and matches various token naming patterns
+- **Configurable**: Toggle on/off via settings or command palette
+
+### 📚 Rich Hover Tooltips
+
+### 📚 Rich Hover Tooltips
+
+- **Detailed token information**: Shows token values, types, and metadata on hover
+- **Color previews in tooltips**: Displays color swatches alongside token details
+- **Usage examples**: Optional code examples for CSS, SCSS, and JavaScript
+- **JSON formatted data**: Clean presentation of token hierarchies
+
+### ⚙️ Smart Configuration
+
+- **Flexible token file paths**: Support for relative and absolute paths
+- **Workspace-specific settings**: Configure per-project token files
+- **Multiple file format support**: Works with various design token JSON structures
+
+## Quick Start
+
+### 1. Installation
+
+Install the extension in VS Code or run it in development mode.
+
+### 2. Configure Token File Path
+
+Set the path to your design tokens JSON file in VS Code settings:
+
+```json
+{
+  "designToken.filePath": "./src/tokens/design-tokens.json",
+  "designToken.inlineColorPreview": true
+}
+```
+
+### 3. Usage Examples
+
+Once configured, the extension will automatically detect and enhance design tokens in your code:
+
+#### TypeScript/JavaScript
+
+```typescript
+const styles = {
+  primary: "brand.primary-500", // Shows color swatch inline
+  secondary: "system.gray-200", // Shows color swatch inline
+  background: "surface.light", // Shows color swatch inline
+};
+
+// Object property access
+const colors = tokens.brand.primary500; // Shows color swatch inline
+```
+
+#### CSS/SCSS
+
+```css
+.button {
+  color: var(--brand-primary-500); /* Shows color swatch inline */
+  background: var(--surface-light); /* Shows color swatch inline */
+}
+```
+
+```scss
+.button {
+  color: $brand-primary-500; // Shows color swatch inline
+  background: $surface-light; // Shows color swatch inline
+}
+```
+
+### 4. Commands
+
+- **Ctrl+Shift+P** → "Reload Design Tokens" - Refresh token data
+- **Ctrl+Shift+P** → "Toggle Inline Color Preview" - Enable/disable color swatches
+- **Ctrl+Shift+P** → "Inspect Design Token Data" - View loaded token information
+
 ## Development and Testing
 
 ### 1. Set Up Development Environment
@@ -201,16 +286,17 @@ Developer: Reset Extension Host
    - Configure the token file path in settings
    - Use `Ctrl+Shift+P` → "Reload Design Tokens" to reload
 
-
 ## Sample token json files
 
-+ raw-tokens.json
-  + Generated using token-studio and electric-transforms-studio via Style Dictionary in EDS.
+- raw-tokens.json
 
-+ electric-raw-tokens.json
-  + Derived from raw-tokens.json, generated with electric/design-token-intelliSense-raw-input via Style Dictionary in EDS.
-  + Serves as the input for the TokenParser in this repository.
+  - Generated using token-studio and electric-transforms-studio via Style Dictionary in EDS.
 
-+ flat-token-map.json
-  + The core data structure used for quick lookups.
-  + Generated from electric-raw-tokens.json by the TokenParser.
+- electric-raw-tokens.json
+
+  - Derived from raw-tokens.json, generated with electric/design-token-intelliSense-raw-input via Style Dictionary in EDS.
+  - Serves as the input for the TokenParser in this repository.
+
+- flat-token-map.json
+  - The core data structure used for quick lookups.
+  - Generated from electric-raw-tokens.json by the TokenParser.

@@ -4,6 +4,7 @@ import { DesignTokenHoverProvider } from "./hover-providers/DesignTokenHoverProv
 import { CommandLoader } from "./loaders/CommandLoader";
 import { HoverProviderLoader } from "./loaders/HoverProviderLoader";
 import { TokenContext } from "./token-manager/TokenContext";
+import { DecorationManager } from "./decorations/DecorationManager";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("🎨 Design Token Tooltip extension is now active!");
@@ -18,8 +19,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   const hoverProvider = new DesignTokenHoverProvider(tokenContext); // wire up the hover provider with the token context
 
+  // Initialize inline color decorations
+  const decorationManager = new DecorationManager(context, tokenContext);
+  context.subscriptions.push(decorationManager);
+  console.log("✅ Token color decorations initialized...");
+
   new HoverProviderLoader(context, hoverProvider).load(); // load into vscode
-  new CommandLoader(context, hoverProvider).load();
+  new CommandLoader(context, hoverProvider, decorationManager).load();
 }
 
 export function deactivate() {}
