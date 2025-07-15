@@ -17,7 +17,7 @@ export type TokenData = {
 };
 
 export type TokenMapValue = {
-  value: string;
+  value: string | Record<string, string>; // some token has a compound value
   type: string;
 };
 
@@ -55,7 +55,10 @@ export class TokenContext {
     );
     this.flatTokenMap = flatTokenMap;
 
-    this.tokenDataLoader.exportTokenMap(); // export the token map to a json file for quick lookup
+    TokenDataLoader.exportTokenMap({
+      map: flatTokenMap,
+      fileName: "flat-token-map.json",
+    }); // export the token map to a json file for quick lookup
     vscode.window.showInformationMessage(
       `✅ Design tokens loaded! Found ${this.flatTokenMap.size} tokens.`
     );

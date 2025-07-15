@@ -1,5 +1,6 @@
 import { TokenData } from "../hover-providers/DesignTokenHoverProvider";
 import { FlatTokenMap, TokenMapValue, TokenNames } from "./TokenContext";
+import { TokenDataLoader } from "./TokenDataLoader";
 
 /**
  * TokenParser: A utility class to parse and flatten design tokens, also includes some token related utilities.
@@ -42,12 +43,56 @@ export class TokenParser {
   }: {
     flatTokenData: Map<string, string>;
     tokenName: string;
-  }): string | null {
+  }): string | Record<string, string> | null {
+    function createTokenRegex(tokenName: string): RegExp {
+      // Escape special regex characters in tokenName
+      const escapedTokenName = tokenName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`${escapedTokenName}\\.(\\w+)`);
+    }
+    function haveSamePrefix(keyArray: string[]): boolean {
+      if (keyArray.length === 0) return true;
+
+      // Extract prefix from each key (everything before the last dot)
+      const prefixes = keyArray.map((key) => {
+        const lastDotIndex = key.lastIndexOf(".");
+        return lastDotIndex !== -1 ? key.substring(0, lastDotIndex) : key;
+      });
+
+      // Check if all prefixes are the same
+      const firstPrefix = prefixes[0];
+      return prefixes.every((prefix) => prefix === firstPrefix);
+    }
+
+    const compoundTokenValueFullPaths: string[] = [];
     for (const [fullPath, value] of flatTokenData.entries()) {
       if (fullPath.endsWith(`.${tokenName}`) || fullPath === tokenName) {
         return value;
+      } else if (fullPath.includes(tokenName)) {
+        // for compound token values, we need to collect all paths that match the tokenName
+        const regex = createTokenRegex(tokenName);
+        if (fullPath.match(regex)) {
+          compoundTokenValueFullPaths.push(fullPath);
+        }
       }
     }
+
+    // construct the compound token value object
+    if (
+      compoundTokenValueFullPaths.length > 0 &&
+      haveSamePrefix(compoundTokenValueFullPaths)
+    ) {
+      const compoundValue: Record<string, string> = {};
+      // Extract the last part of the full path as the key
+      for (const path of compoundTokenValueFullPaths) {
+        const key = path.split(".").pop();
+        const value = flatTokenData.get(path);
+        if (key && value) {
+          compoundValue[key] = value;
+        }
+      }
+      return compoundValue;
+    }
+
     return null;
   }
 
@@ -84,16 +129,20 @@ export class TokenParser {
         const currentPath = parentPath ? `${parentPath}.${key}` : key;
 
         if (typeof value === "string") {
-          // Found a token value at leaf node
           result.set(currentPath, value);
+        } else if (typeof value === "number") {
+          result.set(currentPath, value.toString()); // the value might be a number, this is likely due to upperstream typo
         } else if (typeof value === "object" && value !== null) {
-          // Recursively flatten nested objects
           flattenTokenData(value, currentPath, result);
         }
       }
       return result;
     }
     const flatTokenData = flattenTokenData(tokenData);
+    TokenDataLoader.exportTokenMap({
+      map: flatTokenData,
+      fileName: "flat-token-data.json",
+    });
 
     let notFoundTokens = [];
     for (const [tokenType, names] of Object.entries(tokenNames)) {

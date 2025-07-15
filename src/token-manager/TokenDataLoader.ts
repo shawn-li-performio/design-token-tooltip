@@ -12,7 +12,7 @@ import { TokenContext } from "./TokenContext";
 export class TokenDataLoader implements Loader {
   private tokenContext: TokenContext;
   private TOKEN_FILE_PATH = "./style-dictionary/electric-raw-tokens.json";
-  private FLAT_TOKEN_MAP_EXPORT_PATH = "./style-dictionary/flat-token-map.json";
+  private static EXPORT_BASE_DIR_PATH = "./style-dictionary";
 
   constructor(tokenContext: TokenContext) {
     this.tokenContext = tokenContext;
@@ -127,15 +127,21 @@ export class TokenDataLoader implements Loader {
     }
   }
 
-  public exportTokenMap() {
+  public static exportTokenMap({
+    map,
+    fileName,
+  }: {
+    map: Map<string, any>;
+    fileName: string;
+  }) {
     // export the token map to a json file
-    const tokenMap = this.tokenContext.getTokenMap();
-    const tokenMapJson = JSON.stringify(Object.fromEntries(tokenMap), null, 2);
+    // const map = this.tokenContext.getTokenMap();
+    const mapJson = JSON.stringify(Object.fromEntries(map), null, 2);
     const exportPath = path.join(
       vscode.workspace.workspaceFolders?.[0].uri.fsPath || "",
-      this.FLAT_TOKEN_MAP_EXPORT_PATH
+      this.EXPORT_BASE_DIR_PATH + "/" + fileName
     );
-    fs.writeFileSync(exportPath, tokenMapJson, "utf8");
+    fs.writeFileSync(exportPath, mapJson, "utf8");
     vscode.window.showInformationMessage(`Token map exported to ${exportPath}`);
   }
 }
