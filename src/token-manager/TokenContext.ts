@@ -18,7 +18,7 @@ export type TokenData = {
 
 export type TokenMapValue = {
   value: string | Record<string, string>; // some token has a compound value
-  type: string;
+  type: string[];
 };
 
 export type FlatTokenMap = Map<AllTokenNames<TokenNames>, TokenMapValue>;

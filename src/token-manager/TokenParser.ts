@@ -144,21 +144,48 @@ export class TokenParser {
       fileName: "flat-token-data.json",
     });
 
-    let notFoundTokens = [];
-    for (const [tokenType, names] of Object.entries(tokenNames)) {
-      for (const tokenName of names) {
-        //! Find the value in the nested token data
-        const value = this.findTokenValue({ flatTokenData, tokenName });
+    /**
+     * Flatten the token names structure into a Map
+     * this is to facilitate flat token map creation process since token names can be duplicated in origial tokenNames
+     * e.g. "forms.inputs.inline-placeholder-hover-foreground" can be both in 'ThemeColorsToken' and 'SemanticColorToken'
+     * @returns Map<string, string[]> - A map where each key is a token name and the value is an array of token types (yes, a token name can have multiple token types)
+     */
+    function flattenTokenNames(tokenNames: TokenNames): Map<string, string[]> {
+      const flatTokenNames = new Map<string, string[]>();
+      Object.keys(tokenNames).forEach((tokenType) => {
+        tokenNames[tokenType].forEach((tokenName) => {
+          if (!flatTokenNames.has(tokenName)) {
+            flatTokenNames.set(tokenName, []);
+          }
+          flatTokenNames.get(tokenName)?.push(tokenType);
+        });
+      });
 
-        if (value !== null) {
-          flatMap.set(tokenName, {
-            value,
-            type: tokenType,
-          });
-        } else {
-          // Handle missing tokens - you might want to log this or throw an error
-          notFoundTokens.push(tokenName);
+      return flatTokenNames;
+    }
+    const flatTokenNames = flattenTokenNames(tokenNames);
+    TokenDataLoader.exportTokenMap({
+      map: flatTokenNames,
+      fileName: "flat-token-names.json",
+    });
+
+
+    let notFoundTokens = [];
+    let duplicatedTokenNames = [];
+    for (const [tokenName, tokenTypes] of flatTokenNames.entries()) {
+      const value = this.findTokenValue({ flatTokenData, tokenName });
+
+      if (value !== null) {
+        if (flatMap.has(tokenName)) {
+          duplicatedTokenNames.push(tokenName);
         }
+
+        flatMap.set(tokenName, {
+          value,
+          type: tokenTypes,
+        });
+      } else {
+        notFoundTokens.push(tokenName);
       }
     }
 
@@ -169,12 +196,13 @@ export class TokenParser {
         "Details:\n",
       notFoundTokens
     );
+    console.log(`flatTokenNames size: ${flatTokenNames.size}`);
     console.log(
       `✅ Token map created with ${flatMap.size} entries from ${
         Object.keys(tokenNames).length
-      } token types.`
+      } token types with a total of ${flatTokenNames.size} tokens.`
     );
-    console.log();
+    console.log(`duplicated token names:`, duplicatedTokenNames);
 
     return flatMap;
   }
