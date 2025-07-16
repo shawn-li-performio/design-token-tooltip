@@ -1,0 +1,28 @@
+# ignore files for VS Code extension to reduce package size
+
+# Source files (since you have compiled JS in /out)
+src/**
+**/*.ts
+
+# Development files
+.vscode/**
+.vscode-test/**
+tsconfig.json
+.eslintrc.json
+
+# Build artifacts
+**/*.map
+out/test/**
+
+# Git and docs
+.git/**
+.gitignore
+README.md
+vsc-extension-quickstart.md
+**/*.md
+
+# Dependencies
+node_modules/.bin/**
+
+# Other
+.yarnrc
