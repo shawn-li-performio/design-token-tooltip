@@ -41,9 +41,9 @@ export class TokenContext {
   // token query (including current token inspector) - mainly for extracting information from flatTokenMap
   // a dedicated HoverContentFactory that uses token query to build hover content
 
-  constructor() {
+  constructor(extensionContext: vscode.ExtensionContext) {
     // step1:
-    this.tokenDataLoader = new TokenDataLoader(this);
+    this.tokenDataLoader = new TokenDataLoader(this, extensionContext);
     this.tokenDataLoader.load(); // read electric-raw-token.json and assgin value to `this.tokenData` and `this.tokenNames`
     console.log("✅ Token names loaded:", Object.keys(this.tokenNames));
     console.log("✅ Token data loaded:", Object.keys(this.tokenData));

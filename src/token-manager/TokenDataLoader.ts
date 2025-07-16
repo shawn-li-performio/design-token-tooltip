@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { Loader } from "../loaders/Loader";
 import { TokenContext } from "./TokenContext";
+import { error } from "../libs/vscode";
 
 /**
  * TokenDataLoader: An IO utility class to load design token data from a JSON file.
@@ -11,11 +12,16 @@ import { TokenContext } from "./TokenContext";
  */
 export class TokenDataLoader implements Loader {
   private tokenContext: TokenContext;
+  private extensionContext: vscode.ExtensionContext;
   private TOKEN_FILE_PATH = "./style-dictionary/electric-raw-tokens.json";
   private static EXPORT_BASE_DIR_PATH = "./style-dictionary";
 
-  constructor(tokenContext: TokenContext) {
+  constructor(
+    tokenContext: TokenContext,
+    extensionContext: vscode.ExtensionContext
+  ) {
     this.tokenContext = tokenContext;
+    this.extensionContext = extensionContext;
   }
 
   async load() {
@@ -27,19 +33,9 @@ export class TokenDataLoader implements Loader {
       return;
     }
 
-    // TODO: make sure to read the electric-raw-tokens.json file from this repo, not host repo -> so that we can use extension anywhere
-    // make sure the dirPath is absolute
     let dirPath = this.TOKEN_FILE_PATH;
     if (!path.isAbsolute(dirPath)) {
-      const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-      if (workspaceFolder) {
-        dirPath = path.join(workspaceFolder.uri.fsPath, dirPath);
-      } else {
-        vscode.window.showErrorMessage(
-          "No workspace folder found. Cannot resolve relative directory path."
-        );
-        return;
-      }
+      dirPath = path.join(this.extensionContext.extensionPath, dirPath);
     }
 
     const electricRawTokenJsonData = this.loadJsonFile({
@@ -106,23 +102,28 @@ export class TokenDataLoader implements Loader {
         console.log("🎯 Raw token data structure:", Object.keys(newTokenData));
         return newTokenData;
       } else {
-        console.error("❌ Token file not found in json file:", fullPath);
-        vscode.window.showErrorMessage(
-          `Token file not found in json file: ${fullPath}`
-        );
+        error({
+          showVscodeWindowMessage: true,
+          message: ["❌ Token file not found:", fullPath],
+        });
+
         return null;
       }
-    } catch (error) {
-      console.error("💥 Error loading token data:", error);
-      if (error instanceof SyntaxError) {
-        vscode.window.showErrorMessage(
-          `Invalid JSON in token file: ${error.message}`
-        );
+    } catch (err) {
+      console.error("💥 Error loading token data:", err);
+      if (err instanceof SyntaxError) {
+        error({
+          showVscodeWindowMessage: true,
+          message: `❌ Invalid JSON in token file: ${err.message}`,
+        });
+
         return null;
       } else {
-        vscode.window.showErrorMessage(
-          "Failed to load design tokens: " + error
-        );
+        error({
+          showVscodeWindowMessage: true,
+          message: `❌ Failed to load design tokens json file from ${filePath}`,
+        });
+
         return null;
       }
     }
