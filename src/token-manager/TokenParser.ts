@@ -1,4 +1,5 @@
 import { TokenData } from "../hover-providers/DesignTokenHoverProvider";
+import { error, warn } from "../libs/vscode";
 import { FlatTokenMap, TokenMapValue, TokenNames } from "./TokenContext";
 import { TokenDataLoader } from "./TokenDataLoader";
 
@@ -161,6 +162,68 @@ export class TokenParser {
         });
       });
 
+      function checkTokenThatHasMultipleTypes() {
+        const tokenNamesWithMultipleTypes = Array.from(flatTokenNames.entries())
+          .filter(([_, types]) => types.length >= 2)
+          .map(([tokenName, __]) => tokenName);
+
+        const tokenNamesWithMultipleTypesExcludingThemeType = Array.from(
+          flatTokenNames.entries()
+        )
+          .filter(
+            ([_, types]) =>
+              types.length >= 2 &&
+              !types.some((type) => type.toLowerCase().startsWith("theme")) // theme token are usually just referencing other tokens
+          )
+          .map(([tokenName, __]) => tokenName);
+
+        const tokenNamesWithMultipleTypesIncludingThemeType = Array.from(
+          flatTokenNames.entries()
+        )
+          .filter(
+            ([_, types]) =>
+              types.length >= 2 &&
+              types.some((type) => type.toLowerCase().startsWith("theme")) // theme token are usually just referencing other tokens
+          )
+          .map(([tokenName, __]) => tokenName);
+
+        //! theme token are just referencing another token, it should not have more than two types
+        const tokenNamesWithMoreThanTwoTypesIncludingThemeType = Array.from(
+          flatTokenNames.entries()
+        )
+          .filter(
+            ([_, types]) =>
+              types.length >= 3 &&
+              types.some((type) => type.toLowerCase().startsWith("theme")) // theme token are usually just referencing other tokens
+          )
+          .map(([tokenName, __]) => tokenName);
+        if (tokenNamesWithMoreThanTwoTypesIncludingThemeType.length > 0) {
+          error({
+            showVscodeWindowMessage: true,
+            message: `⚠️ ${
+              tokenNamesWithMoreThanTwoTypesIncludingThemeType.length
+            } token names found with more than two token types including theme type: ${tokenNamesWithMoreThanTwoTypesIncludingThemeType.slice(
+              0,
+              10
+            )}...`,
+          });
+        }
+
+        warn({
+          message: [
+            `⚠️ ${tokenNamesWithMultipleTypes.length} token names found with multiple token types \n`,
+            `⚠️ ${
+              tokenNamesWithMultipleTypesIncludingThemeType.length
+            } token names found with multiple token types including theme type: ${tokenNamesWithMultipleTypesIncludingThemeType.slice(
+              0,
+              20
+            )}... \n`,
+            `⚠️ ${tokenNamesWithMultipleTypesExcludingThemeType.length} token names found with multiple token types excluding theme type: ${tokenNamesWithMultipleTypesExcludingThemeType}`,
+          ],
+        });
+      }
+      checkTokenThatHasMultipleTypes();
+
       return flatTokenNames;
     }
     const flatTokenNames = flattenTokenNames(tokenNames);
@@ -169,7 +232,7 @@ export class TokenParser {
       fileName: "flat-token-names.json",
     });
 
-
+    // TODO: better make the value also an array, corresponding to each token type (e.g. 'sm')
     let notFoundTokens = [];
     let duplicatedTokenNames = [];
     for (const [tokenName, tokenTypes] of flatTokenNames.entries()) {

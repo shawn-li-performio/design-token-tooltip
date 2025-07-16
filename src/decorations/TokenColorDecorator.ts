@@ -19,6 +19,7 @@ export class TokenColorDecorator {
     });
   }
 
+  // ! core decoration creation logic
   public updateDecorations(editor: vscode.TextEditor): void {
     if (!editor) {
       return;
@@ -75,7 +76,7 @@ export class TokenColorDecorator {
                 height: "12px",
               },
             },
-            hoverMessage: `🎨 **${tokenName}**: ${tokenInfo.value}`,
+            // hoverMessage: `🎨 **${tokenName}**: ${tokenInfo.value}`,
           };
 
           decorations.push(decoration);

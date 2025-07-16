@@ -23,7 +23,7 @@ export class DecorationManager {
           this.isSupportedLanguage(editor.document.languageId) &&
           this.isInlinePreviewEnabled()
         ) {
-          this.decorator.updateDecorations(editor);
+          this.decorator.updateDecorations(editor); //! update action
         }
       })
     );

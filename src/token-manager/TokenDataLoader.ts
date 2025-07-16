@@ -27,6 +27,7 @@ export class TokenDataLoader implements Loader {
       return;
     }
 
+    // TODO: make sure to read the electric-raw-tokens.json file from this repo, not host repo -> so that we can use extension anywhere
     // make sure the dirPath is absolute
     let dirPath = this.TOKEN_FILE_PATH;
     if (!path.isAbsolute(dirPath)) {
