@@ -4,6 +4,7 @@
   "description": "Visualize design tokens in VS Code with inline color previews and tooltips.",
   "version": "1.0.0",
   "publisher": "Performio",
+  "readme": "README.md",
   "engines": {
     "vscode": "^1.85.0"
   },

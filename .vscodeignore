@@ -17,9 +17,9 @@ out/test/**
 # Git and docs
 .git/**
 .gitignore
-README.md
+
 vsc-extension-quickstart.md
-**/*.md
+docs/**/*.md
 
 # Dependencies
 node_modules/.bin/**
