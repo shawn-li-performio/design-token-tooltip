@@ -8,6 +8,8 @@ const SUPPORTED_LANGUAGES = [
   "less",
   "javascript",
   "typescript",
+  "typescriptreact", // for TSX
+  "javascriptreact", // for JSX
   "vue",
   "html",
 ];

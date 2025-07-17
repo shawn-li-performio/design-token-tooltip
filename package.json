@@ -1,6 +1,6 @@
 {
   "name": "electric-design-token-intellisense",
-  "displayName": "Electric Deisn Token IntelliSense",
+  "displayName": "Electric Design Token IntelliSense",
   "description": "Visualize design tokens in VS Code with inline color previews and tooltips.",
   "version": "1.0.0",
   "publisher": "Performio",
@@ -16,6 +16,8 @@
     "onLanguage:less",
     "onLanguage:javascript",
     "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
     "onLanguage:vue",
     "onLanguage:html"
   ],
@@ -57,8 +59,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "compile": "NODE_ENV=production tsc -p ./",
+    "watch": "NODE_ENV=development tsc -watch -p ./",
+    "package": "npm run compile && vsce package",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"

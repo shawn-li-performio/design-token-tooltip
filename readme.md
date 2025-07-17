@@ -2,32 +2,11 @@
 
 A VS Code extension that provides hover tooltips and inline color previews for design tokens, similar to Tailwind CSS IntelliSense.
 
-## 🎨 Key Features
+- [key features](./docs/features.md)
 
-### ✨ Inline Color Preview (NEW!)
+- [how to distribute and use the extension](./docs//use-extension.md)
 
-- **Real-time color swatches**: Color previews appear directly next to design tokens in your code
-- **Tailwind CSS IntelliSense-like experience**: Small color squares show inline with token names
-- **Multiple formats supported**: Works with string literals, CSS custom properties, SCSS variables, and object property access
-- **Smart detection**: Automatically finds and matches various token naming patterns
-- **Configurable**: Toggle on/off via settings or command palette
-
-### 📚 Rich Hover Tooltips
-
-### 📚 Rich Hover Tooltips
-
-- **Detailed token information**: Shows token values, types, and metadata on hover
-- **Color previews in tooltips**: Displays color swatches alongside token details
-- **Usage examples**: Optional code examples for CSS, SCSS, and JavaScript
-- **JSON formatted data**: Clean presentation of token hierarchies
-
-### ⚙️ Smart Configuration
-
-- **Flexible token file paths**: Support for relative and absolute paths
-- **Workspace-specific settings**: Configure per-project token files
-- **Multiple file format support**: Works with various design token JSON structures
-
-## Quick Start
+## Quick Start for Developing the extension
 
 ### 1. Installation
 

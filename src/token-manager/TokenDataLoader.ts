@@ -136,6 +136,11 @@ export class TokenDataLoader implements Loader {
     map: Map<string, any>;
     fileName: string;
   }) {
+    const isDevelopment = process.env.NODE_ENV === "development";
+    if (!isDevelopment) {
+      return;
+    }
+
     // export the token map to a json file
     // const map = this.tokenContext.getTokenMap();
     const mapJson = JSON.stringify(Object.fromEntries(map), null, 2);

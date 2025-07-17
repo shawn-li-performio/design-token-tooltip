@@ -36,6 +36,11 @@ export function error(options: MessageOptions) {
 }
 
 export function info(options: MessageOptions) {
+  // const isDevelopment = process.env.NODE_ENV === "development";
+  // if (!isDevelopment) {
+  //   return;
+  // }
+
   const { showVscodeWindowMessage = false, message } = options;
   const { _message, _items } = argConverter(message);
 
